@@ -23,9 +23,10 @@ export default async function InvoicesPage() {
         actions={
           <div className="flex items-center gap-2">
             <ReportDownloader 
+              title="Relatório de Notas de Entrada"
               data={invoices} 
               headers={invoiceHeaders} 
-              filename="relatorio_notas_entrada.csv"
+              filename="relatorio_notas_entrada.docx"
             />
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />

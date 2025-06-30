@@ -23,9 +23,10 @@ export default async function InventoryPage() {
         actions={
           <div className="flex items-center gap-2">
             <ReportDownloader 
+                title="Relatório de Inventário"
                 data={products} 
                 headers={productHeaders} 
-                filename="relatorio_inventario.csv"
+                filename="relatorio_inventario.docx"
             />
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />

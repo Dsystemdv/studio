@@ -23,9 +23,10 @@ export default async function SalesPage() {
         actions={
           <div className="flex items-center gap-2">
              <ReportDownloader 
+                title="Relatório de Vendas"
                 data={sales} 
                 headers={saleHeaders} 
-                filename="relatorio_vendas.csv"
+                filename="relatorio_vendas.docx"
             />
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />

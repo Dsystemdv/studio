@@ -45,7 +45,7 @@ export default function InvoicesTable({ invoices }: { invoices: Invoice[] }) {
             {invoices.map((invoice) => (
               <TableRow key={invoice.id}>
                 <TableCell className="font-medium">{invoice.id.toUpperCase()}</TableCell>
-                <TableCell>{new Date(invoice.date).toLocaleDateString("pt-BR")}</TableCell>
+                <TableCell>{new Date(invoice.date).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}</TableCell>
                 <TableCell>{invoice.supplier}</TableCell>
                 <TableCell className="text-right">
                   {invoice.total.toLocaleString("pt-BR", {

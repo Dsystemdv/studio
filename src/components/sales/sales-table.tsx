@@ -52,7 +52,7 @@ export default function SalesTable({ sales, products }: { sales: Sale[], product
           new Paragraph({
             children: [
               new TextRun({ text: "Data: ", bold: true }),
-              new TextRun(new Date(sale.date).toLocaleDateString("pt-BR")),
+              new TextRun(new Date(sale.date).toLocaleDateString("pt-BR", { timeZone: 'UTC' })),
             ],
             spacing: { after: 400 },
           }),
@@ -115,7 +115,7 @@ export default function SalesTable({ sales, products }: { sales: Sale[], product
             {sales.map((sale) => (
               <TableRow key={sale.id}>
                 <TableCell className="font-medium">{sale.id.toUpperCase()}</TableCell>
-                <TableCell>{new Date(sale.date).toLocaleDateString("pt-BR")}</TableCell>
+                <TableCell>{new Date(sale.date).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}</TableCell>
                 <TableCell>{getProductDetails(sale)}</TableCell>
                 <TableCell className="text-right">
                   {sale.total.toLocaleString("pt-BR", {

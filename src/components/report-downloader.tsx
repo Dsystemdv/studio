@@ -5,6 +5,7 @@ import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import type { Product } from "@/lib/types";
+import { useState, useEffect } from "react";
 
 type ReportDownloaderProps<T> = {
   data: T[];
@@ -24,6 +25,13 @@ export default function ReportDownloader<T extends object>({
   products,
 }: ReportDownloaderProps<T>) {
 
+  const [generatedDate, setGeneratedDate] = useState("");
+
+  useEffect(() => {
+    setGeneratedDate(new Date().toLocaleDateString("pt-BR"));
+  }, []);
+
+
   const generateDoc = () => {
     if (!data || data.length === 0) {
       alert("Não há dados para gerar o relatório.");
@@ -40,7 +48,7 @@ export default function ReportDownloader<T extends object>({
         spacing: { after: 200 },
       }),
       new Paragraph({
-        text: `Relatório gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
+        text: `Relatório gerado em: ${generatedDate}`,
         alignment: AlignmentType.CENTER,
         spacing: { after: 400 },
       }),
@@ -83,7 +91,7 @@ export default function ReportDownloader<T extends object>({
             if (typeof cellValue === 'number' && (label.toLowerCase().includes('preço') || label.toLowerCase().includes('total'))) {
                 cellText = cellValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
             } else if (key === 'date' && typeof cellValue === 'string') {
-                cellText = new Date(cellValue).toLocaleDateString("pt-BR");
+                cellText = new Date(cellValue).toLocaleDateString("pt-BR", { timeZone: 'UTC' });
             } else {
                 cellText = String(cellValue);
             }

@@ -1,5 +1,4 @@
 // NOTE: This file is now used to manage the SQLite database connection.
-'use server';
 
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';

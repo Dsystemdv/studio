@@ -1,58 +1,45 @@
-import fs from 'fs/promises';
-import path from 'path';
+import { getDb } from './firebase';
 import type { Product, Sale, Invoice } from '@/lib/types';
 
-// Path to the JSON database file
-const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
-
-// --- Types for the database structure ---
-interface Database {
-  products: Product[];
-  sales: Sale[];
-  invoices: Invoice[];
-}
-
-// --- Helper function to read the database ---
-async function readDb(): Promise<Database> {
-  try {
-    const fileContent = await fs.readFile(dbPath, 'utf-8');
-    return JSON.parse(fileContent);
-  } catch (error) {
-    console.error("Error reading db.json:", error);
-    return { products: [], sales: [], invoices: [] };
-  }
-}
-
-// NOTA: Estas funções agora leem do arquivo db.json.
+// The 'db' is now a singleton promise from the repurposed firebase.ts file
+const db = getDb();
 
 export const getProducts = async (): Promise<Product[]> => {
-  console.log("Buscando produtos do db.json...");
-  const db = await readDb();
-  return db.products;
+  console.log("Buscando produtos do SQLite...");
+  const conn = await db;
+  return await conn.all('SELECT * FROM products ORDER BY name');
 };
 
 export const getSales = async (): Promise<Sale[]> => {
-    console.log("Buscando vendas do db.json...");
-    const db = await readDb();
-    return db.sales;
+    console.log("Buscando vendas do SQLite...");
+    const conn = await db;
+    const sales = await conn.all('SELECT * FROM sales ORDER BY date DESC');
+    return sales.map(sale => ({
+      ...sale,
+      items: JSON.parse(sale.items)
+    }));
 };
 
 export const getInvoices = async (): Promise<Invoice[]> => {
-    console.log("Buscando notas de entrada do db.json...");
-    const db = await readDb();
-    return db.invoices;
+    console.log("Buscando notas de entrada do SQLite...");
+    const conn = await db;
+    const invoices = await conn.all('SELECT * FROM invoices ORDER BY date DESC');
+    return invoices.map(invoice => ({
+        ...invoice,
+        items: JSON.parse(invoice.items)
+    }));
 };
 
 export const getLowStockProducts = async (
   threshold = 10
 ): Promise<Product[]> => {
-    console.log("Buscando produtos com baixo estoque do db.json...");
-    const db = await readDb();
-    return db.products.filter(p => p.stock < threshold);
+    console.log("Buscando produtos com baixo estoque do SQLite...");
+    const conn = await db;
+    return await conn.all('SELECT * FROM products WHERE stock < ? ORDER BY stock ASC', threshold);
 };
 
 export const getProductById = async (id: string): Promise<Product | undefined> => {
-    console.log(`Buscando produto com ID ${id} do db.json...`);
-    const db = await readDb();
-    return db.products.find(p => p.id === id);
+    console.log(`Buscando produto com ID ${id} do SQLite...`);
+    const conn = await db;
+    return await conn.get('SELECT * FROM products WHERE id = ?', id);
 };

@@ -29,3 +29,9 @@ export interface Invoice {
   }[];
   total: number;
 }
+
+export interface Database {
+  products: Product[];
+  sales: Sale[];
+  invoices: Invoice[];
+}

@@ -1,32 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import fs from 'fs/promises';
-import path from 'path';
-import type { Product, Sale, Invoice } from './types';
+import { getDb } from './firebase';
+import type { Product } from './types';
 
-// Path to the JSON database file
-const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
-
-// --- Types for the database structure ---
-interface Database {
-  products: Product[];
-  sales: Sale[];
-  invoices: Invoice[];
-}
-
-// --- Helper functions to read/write the database ---
-async function readDb(): Promise<Database> {
-  const fileContent = await fs.readFile(dbPath, 'utf-8');
-  return JSON.parse(fileContent);
-}
-
-async function writeDb(data: Database): Promise<void> {
-  await fs.writeFile(dbPath, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-
-// NOTA: Estas ações agora leem e escrevem no arquivo db.json.
+// The 'db' is now a singleton promise from the repurposed firebase.ts file
+const db = getDb();
 
 export async function deleteSale(saleId: string) {
   if (!saleId) {
@@ -34,9 +13,12 @@ export async function deleteSale(saleId: string) {
   }
 
   try {
-    const db = await readDb();
-    const updatedSales = db.sales.filter((sale) => sale.id !== saleId);
-    await writeDb({ ...db, sales: updatedSales });
+    const conn = await db;
+    const result = await conn.run('DELETE FROM sales WHERE id = ?', saleId);
+    
+    if (result.changes === 0) {
+      return { success: false, message: 'Venda não encontrada.' };
+    }
     
     revalidatePath('/sales');
     revalidatePath('/');
@@ -53,9 +35,12 @@ export async function deleteInvoice(invoiceId: string) {
   }
 
   try {
-    const db = await readDb();
-    const updatedInvoices = db.invoices.filter((invoice) => invoice.id !== invoiceId);
-    await writeDb({ ...db, invoices: updatedInvoices });
+    const conn = await db;
+    const result = await conn.run('DELETE FROM invoices WHERE id = ?', invoiceId);
+    
+    if (result.changes === 0) {
+      return { success: false, message: 'Nota de entrada não encontrada.' };
+    }
 
     revalidatePath('/invoices');
     revalidatePath('/');
@@ -72,13 +57,20 @@ export async function updateProduct(productData: Product) {
   }
 
   try {
-    const db = await readDb();
-    const productIndex = db.products.findIndex((p) => p.id === productData.id);
-    if (productIndex === -1) {
+    const conn = await db;
+    const result = await conn.run(
+        'UPDATE products SET name = ?, category = ?, stock = ?, costPrice = ?, price = ? WHERE id = ?',
+        productData.name,
+        productData.category,
+        productData.stock,
+        productData.costPrice,
+        productData.price,
+        productData.id
+    );
+
+    if (result.changes === 0) {
         return { success: false, message: 'Produto não encontrado.' };
     }
-    db.products[productIndex] = productData;
-    await writeDb(db);
 
     revalidatePath('/inventory');
     revalidatePath('/');
@@ -96,9 +88,12 @@ export async function deleteProduct(productId: string) {
   }
 
   try {
-    const db = await readDb();
-    const updatedProducts = db.products.filter((product) => product.id !== productId);
-    await writeDb({ ...db, products: updatedProducts });
+    const conn = await db;
+    const result = await conn.run('DELETE FROM products WHERE id = ?', productId);
+    
+    if (result.changes === 0) {
+      return { success: false, message: 'Produto não encontrado.' };
+    }
     
     revalidatePath('/inventory');
     revalidatePath('/');

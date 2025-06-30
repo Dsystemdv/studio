@@ -1,19 +1,19 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+// Este arquivo é um placeholder para a configuração do seu banco de dados externo.
+// Você pode inicializar o cliente do seu banco de dados aqui e exportá-lo.
+//
+// Exemplo para Prisma:
+//
+// import { PrismaClient } from '@prisma/client'
+// export const db = new PrismaClient()
+//
+// Exemplo para Drizzle:
+//
+// import { drizzle } from 'drizzle-orm/postgres-js';
+// import postgres from 'postgres';
+//
+// const connectionString = process.env.DATABASE_URL;
+// const client = postgres(connectionString);
+// export const db = drizzle(client);
 
-// IMPORTANT: Replace this with your own Firebase project configuration!
-// You can find this in your Firebase project settings.
-export const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000000000"
-};
-
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-
-export { db };
+// Como estamos usando dados de exemplo por enquanto, este arquivo não está sendo usado ativamente.
+// As funções de dados estão em src/lib/data.ts e as ações em src/lib/actions.ts.

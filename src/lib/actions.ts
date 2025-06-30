@@ -1,114 +1,77 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db, firebaseConfig } from './firebase';
 import type { Product } from './types';
 
-export async function deleteSale(saleId: string) {
-  const isFirebaseConfigured = firebaseConfig.projectId !== 'your-project-id';
 
-  if (!isFirebaseConfigured) {
-    return { success: false, message: 'A exclusão não é possível pois o Firebase não está configurado.' };
-  }
-  
+// NOTA: Estas ações são agora placeholders.
+// Você deve substituir a lógica para chamar sua API de banco de dados externa.
+
+export async function deleteSale(saleId: string) {
   if (!saleId) {
     return { success: false, message: 'ID da venda inválido.' };
   }
 
   try {
-    const saleRef = doc(db, 'sales', saleId);
-    await deleteDoc(saleRef);
-
+    console.log(`Simulando a exclusão da venda: ${saleId}`);
+    // Substitua pela sua chamada de banco de dados real, ex: await fetch('https://api.example.com/sales/saleId', { method: 'DELETE' })
     revalidatePath('/sales');
-    revalidatePath('/'); // Also revalidate dashboard
-    return { success: true, message: 'Venda excluída com sucesso.' };
+    revalidatePath('/'); // Também revalida o dashboard
+    return { success: true, message: 'Venda excluída com sucesso (simulado).' };
   } catch (error) {
-    console.error('Failed to delete sale:', error);
-    if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique as regras de segurança do seu banco de dados Firestore.' };
-    }
+    console.error('Falha ao excluir a venda:', error);
     return { success: false, message: 'Falha ao excluir a venda.' };
   }
 }
 
 export async function deleteInvoice(invoiceId: string) {
-  const isFirebaseConfigured = firebaseConfig.projectId !== 'your-project-id';
-
-  if (!isFirebaseConfigured) {
-    return { success: false, message: 'A exclusão não é possível pois o Firebase não está configurado.' };
-  }
-  
   if (!invoiceId) {
     return { success: false, message: 'ID da nota inválido.' };
   }
 
   try {
-    const invoiceRef = doc(db, 'invoices', invoiceId);
-    await deleteDoc(invoiceRef);
-
+    console.log(`Simulando a exclusão da nota de entrada: ${invoiceId}`);
+    // Substitua pela sua chamada de banco de dados real
     revalidatePath('/invoices');
-    revalidatePath('/'); // Also revalidate dashboard
-    return { success: true, message: 'Nota de entrada excluída com sucesso.' };
+    revalidatePath('/');
+    return { success: true, message: 'Nota de entrada excluída com sucesso (simulado).' };
   } catch (error) {
-    console.error('Failed to delete invoice:', error);
-    if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique as regras de segurança do seu banco de dados Firestore.' };
-    }
+    console.error('Falha ao excluir a nota de entrada:', error);
     return { success: false, message: 'Falha ao excluir a nota de entrada.' };
   }
 }
 
 export async function updateProduct(productData: Product) {
-  const isFirebaseConfigured = firebaseConfig.projectId !== 'your-project-id';
-  if (!isFirebaseConfigured) {
-    return { success: false, message: 'A edição não é possível pois o Firebase não está configurado.' };
-  }
   if (!productData || !productData.id) {
     return { success: false, message: 'Dados do produto inválidos.' };
   }
 
   try {
-    const { id, ...dataToUpdate } = productData;
-    const productRef = doc(db, 'products', id);
-    await updateDoc(productRef, dataToUpdate);
-
+    console.log(`Simulando a atualização do produto: ${productData.id}`, productData);
+    // Substitua pela sua chamada de banco de dados real
     revalidatePath('/inventory');
-    revalidatePath('/'); // Also revalidate dashboard
-    return { success: true, message: 'Produto atualizado com sucesso.' };
+    revalidatePath('/');
+    return { success: true, message: 'Produto atualizado com sucesso (simulado).' };
   } catch (error) {
-    console.error('Failed to update product:', error);
-    if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-        return { success: false, message: 'Falha ao editar: Permissão negada. Verifique as regras de segurança do seu banco de dados Firestore.' };
-    }
+    console.error('Falha ao editar o produto:', error);
     return { success: false, message: 'Falha ao editar o produto.' };
   }
 }
 
 
 export async function deleteProduct(productId: string) {
-  const isFirebaseConfigured = firebaseConfig.projectId !== 'your-project-id';
-
-  if (!isFirebaseConfigured) {
-    return { success: false, message: 'A exclusão não é possível pois o Firebase não está configurado.' };
-  }
-  
   if (!productId) {
     return { success: false, message: 'ID do produto inválido.' };
   }
 
   try {
-    const productRef = doc(db, 'products', productId);
-    await deleteDoc(productRef);
-
+    console.log(`Simulando a exclusão do produto: ${productId}`);
+    // Substitua pela sua chamada de banco de dados real
     revalidatePath('/inventory');
-    revalidatePath('/'); // Also revalidate dashboard
-    return { success: true, message: 'Produto excluído com sucesso.' };
+    revalidatePath('/');
+    return { success: true, message: 'Produto excluído com sucesso (simulado).' };
   } catch (error) {
-    console.error('Failed to delete product:', error);
-    if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique as regras de segurança do seu banco de dados Firestore.' };
-    }
+    console.error('Falha ao excluir o produto:', error);
     return { success: false, message: 'Falha ao excluir o produto.' };
   }
 }

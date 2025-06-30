@@ -1,19 +1,6 @@
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  doc,
-  getDoc,
-  writeBatch,
-} from 'firebase/firestore';
-import { db, firebaseConfig } from './firebase';
 import type { Product, Sale, Invoice } from '@/lib/types';
 
-// Check if Firebase is configured by checking if the project ID is still the placeholder
-const isFirebaseConfigured = firebaseConfig.projectId !== 'your-project-id';
-
-// --- Seed Data (remains the source of truth if Firebase is not configured) ---
+// --- Dados de Exemplo (usados como fallback e para desenvolvimento) ---
 const seedProducts: Product[] = [
   {
     id: 'p1',
@@ -139,133 +126,38 @@ const seedInvoices: Invoice[] = [
   }
 ];
 
-
-let initializationPromise: Promise<void> | null = null;
-const initializeDatabase = () => {
-    if (initializationPromise) {
-        return initializationPromise;
-    }
-    initializationPromise = (async () => {
-        if (!isFirebaseConfigured) {
-            console.warn("Firebase is not configured. Using local mock data. To use Firestore, please configure src/lib/firebase.ts and restart the server.");
-            return;
-        }
-        try {
-            const productsRef = collection(db, 'products');
-            const snapshot = await getDocs(productsRef);
-            if (snapshot.empty) {
-                console.log("Products collection is empty, seeding database...");
-                const batch = writeBatch(db);
-
-                seedProducts.forEach((item) => {
-                    const docRef = doc(db, 'products', item.id);
-                    const { id, ...itemData } = item;
-                    batch.set(docRef, itemData);
-                });
-
-                seedSales.forEach((item) => {
-                    const docRef = doc(db, 'sales', item.id);
-                    const { id, ...itemData } = item;
-                    batch.set(docRef, itemData);
-                });
-
-                seedInvoices.forEach((item) => {
-                    const docRef = doc(db, 'invoices', item.id);
-                    const { id, ...itemData } = item;
-                    batch.set(docRef, itemData);
-                });
-                
-                await batch.commit();
-                console.log("Database seeded successfully.");
-            }
-        } catch (error) {
-            if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-                console.error("Firestore Error: PERMISSION_DENIED. This is likely because the Firestore API is not enabled in your Google Cloud project, or your security rules are too restrictive. Using local mock data as a fallback.");
-            } else {
-                console.error("An error occurred while seeding the database. Using local mock data as a fallback.", error);
-            }
-        }
-    })();
-    return initializationPromise;
-};
+// NOTA: Estas funções agora retornam dados de exemplo.
+// Substitua a lógica interna para buscar dados do seu banco de dados externo.
 
 export const getProducts = async (): Promise<Product[]> => {
-  await initializeDatabase();
-  if (!isFirebaseConfigured) return seedProducts;
-
-  try {
-    const productsCol = collection(db, 'products');
-    const productSnapshot = await getDocs(productsCol);
-    if (productSnapshot.empty) return seedProducts;
-    return productSnapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() }) as Product
-    );
-  } catch (error) {
-    console.error("Failed to fetch products from Firestore. Falling back to local data.", error);
-    return seedProducts;
-  }
+  console.log("Buscando produtos dos dados de exemplo...");
+  // Simula uma chamada de rede
+  await new Promise(resolve => setTimeout(resolve, 50));
+  return seedProducts;
 };
 
 export const getSales = async (): Promise<Sale[]> => {
-    await initializeDatabase();
-    if (!isFirebaseConfigured) return seedSales;
-
-    try {
-        const salesCol = collection(db, 'sales');
-        const salesSnapshot = await getDocs(salesCol);
-        if (salesSnapshot.empty) return seedSales;
-        return salesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Sale));
-    } catch (error) {
-        console.error("Failed to fetch sales from Firestore. Falling back to local data.", error);
-        return seedSales;
-    }
+    console.log("Buscando vendas dos dados de exemplo...");
+    await new Promise(resolve => setTimeout(resolve, 50));
+    return seedSales;
 };
 
 export const getInvoices = async (): Promise<Invoice[]> => {
-    await initializeDatabase();
-    if (!isFirebaseConfigured) return seedInvoices;
-
-    try {
-        const invoicesCol = collection(db, 'invoices');
-        const invoicesSnapshot = await getDocs(invoicesCol);
-        if (invoicesSnapshot.empty) return seedInvoices;
-        return invoicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice));
-    } catch (error) {
-        console.error("Failed to fetch invoices from Firestore. Falling back to local data.", error);
-        return seedInvoices;
-    }
+    console.log("Buscando notas de entrada dos dados de exemplo...");
+    await new Promise(resolve => setTimeout(resolve, 50));
+    return seedInvoices;
 };
 
 export const getLowStockProducts = async (
   threshold = 10
 ): Promise<Product[]> => {
-    await initializeDatabase();
-    if (!isFirebaseConfigured) {
-        return seedProducts.filter(p => p.stock < threshold);
-    }
-    
-    try {
-        const q = query(collection(db, 'products'), where('stock', '<', threshold));
-        const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
-    } catch (error) {
-        console.error("Failed to fetch low stock products from Firestore. Falling back to local data.", error);
-        return seedProducts.filter(p => p.stock < threshold);
-    }
+    console.log("Buscando produtos com baixo estoque dos dados de exemplo...");
+    await new Promise(resolve => setTimeout(resolve, 50));
+    return seedProducts.filter(p => p.stock < threshold);
 };
 
 export const getProductById = async (id: string): Promise<Product | undefined> => {
-    await initializeDatabase();
-    if (!isFirebaseConfigured) {
-        return seedProducts.find(p => p.id === id);
-    }
-
-    try {
-        const docRef = doc(db, 'products', id);
-        const docSnap = await getDoc(docRef);
-        return docSnap.exists() ? ({ id: docSnap.id, ...docSnap.data() } as Product) : undefined;
-    } catch (error) {
-        console.error(`Failed to fetch product ${id} from Firestore. Falling back to local data.`, error);
-        return seedProducts.find(p => p.id === id);
-    }
+    console.log(`Buscando produto com ID ${id} dos dados de exemplo...`);
+    await new Promise(resolve => setTimeout(resolve, 50));
+    return seedProducts.find(p => p.id === id);
 };

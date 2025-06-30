@@ -1,11 +1,32 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import type { Product } from './types';
+import fs from 'fs/promises';
+import path from 'path';
+import type { Product, Sale, Invoice } from './types';
+
+// Path to the JSON database file
+const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
+
+// --- Types for the database structure ---
+interface Database {
+  products: Product[];
+  sales: Sale[];
+  invoices: Invoice[];
+}
+
+// --- Helper functions to read/write the database ---
+async function readDb(): Promise<Database> {
+  const fileContent = await fs.readFile(dbPath, 'utf-8');
+  return JSON.parse(fileContent);
+}
+
+async function writeDb(data: Database): Promise<void> {
+  await fs.writeFile(dbPath, JSON.stringify(data, null, 2), 'utf-8');
+}
 
 
-// NOTA: Estas ações são agora placeholders.
-// Você deve substituir a lógica para chamar sua API de banco de dados externa.
+// NOTA: Estas ações agora leem e escrevem no arquivo db.json.
 
 export async function deleteSale(saleId: string) {
   if (!saleId) {
@@ -13,11 +34,13 @@ export async function deleteSale(saleId: string) {
   }
 
   try {
-    console.log(`Simulando a exclusão da venda: ${saleId}`);
-    // Substitua pela sua chamada de banco de dados real, ex: await fetch('https://api.example.com/sales/saleId', { method: 'DELETE' })
+    const db = await readDb();
+    const updatedSales = db.sales.filter((sale) => sale.id !== saleId);
+    await writeDb({ ...db, sales: updatedSales });
+    
     revalidatePath('/sales');
-    revalidatePath('/'); // Também revalida o dashboard
-    return { success: true, message: 'Venda excluída com sucesso (simulado).' };
+    revalidatePath('/');
+    return { success: true, message: 'Venda excluída com sucesso.' };
   } catch (error) {
     console.error('Falha ao excluir a venda:', error);
     return { success: false, message: 'Falha ao excluir a venda.' };
@@ -30,11 +53,13 @@ export async function deleteInvoice(invoiceId: string) {
   }
 
   try {
-    console.log(`Simulando a exclusão da nota de entrada: ${invoiceId}`);
-    // Substitua pela sua chamada de banco de dados real
+    const db = await readDb();
+    const updatedInvoices = db.invoices.filter((invoice) => invoice.id !== invoiceId);
+    await writeDb({ ...db, invoices: updatedInvoices });
+
     revalidatePath('/invoices');
     revalidatePath('/');
-    return { success: true, message: 'Nota de entrada excluída com sucesso (simulado).' };
+    return { success: true, message: 'Nota de entrada excluída com sucesso.' };
   } catch (error) {
     console.error('Falha ao excluir a nota de entrada:', error);
     return { success: false, message: 'Falha ao excluir a nota de entrada.' };
@@ -47,11 +72,17 @@ export async function updateProduct(productData: Product) {
   }
 
   try {
-    console.log(`Simulando a atualização do produto: ${productData.id}`, productData);
-    // Substitua pela sua chamada de banco de dados real
+    const db = await readDb();
+    const productIndex = db.products.findIndex((p) => p.id === productData.id);
+    if (productIndex === -1) {
+        return { success: false, message: 'Produto não encontrado.' };
+    }
+    db.products[productIndex] = productData;
+    await writeDb(db);
+
     revalidatePath('/inventory');
     revalidatePath('/');
-    return { success: true, message: 'Produto atualizado com sucesso (simulado).' };
+    return { success: true, message: 'Produto atualizado com sucesso.' };
   } catch (error) {
     console.error('Falha ao editar o produto:', error);
     return { success: false, message: 'Falha ao editar o produto.' };
@@ -65,11 +96,13 @@ export async function deleteProduct(productId: string) {
   }
 
   try {
-    console.log(`Simulando a exclusão do produto: ${productId}`);
-    // Substitua pela sua chamada de banco de dados real
+    const db = await readDb();
+    const updatedProducts = db.products.filter((product) => product.id !== productId);
+    await writeDb({ ...db, products: updatedProducts });
+    
     revalidatePath('/inventory');
     revalidatePath('/');
-    return { success: true, message: 'Produto excluído com sucesso (simulado).' };
+    return { success: true, message: 'Produto excluído com sucesso.' };
   } catch (error) {
     console.error('Falha ao excluir o produto:', error);
     return { success: false, message: 'Falha ao excluir o produto.' };

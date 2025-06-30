@@ -20,6 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import type { Sale, Product } from "@/lib/types";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
+import { saveAs } from "file-saver";
 
 export default function SalesTable({ sales, products }: { sales: Sale[], products: Product[] }) {
   const getProductDetails = (sale: Sale) => {
@@ -30,6 +32,66 @@ export default function SalesTable({ sales, products }: { sales: Sale[], product
     return `${sale.items.length} itens`;
   }
   
+  const generateReceipt = (sale: Sale) => {
+    const doc = new Document({
+      sections: [{
+        children: [
+          new Paragraph({
+            text: "Recibo de Venda",
+            heading: HeadingLevel.HEADING_1,
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "ID da Venda: ", bold: true }),
+              new TextRun(sale.id.toUpperCase()),
+            ],
+            spacing: { after: 200 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: "Data: ", bold: true }),
+              new TextRun(new Date(sale.date).toLocaleDateString("pt-BR")),
+            ],
+            spacing: { after: 400 },
+          }),
+          new Paragraph({
+            text: "Itens:",
+            heading: HeadingLevel.HEADING_2,
+            spacing: { after: 200 },
+          }),
+          ...sale.items.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            const itemText = `${item.quantity}x ${product?.name || 'Produto desconhecido'} - ${item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} cada`;
+            return new Paragraph({
+              text: itemText,
+              bullet: { level: 0 },
+            });
+          }),
+          new Paragraph({
+             spacing: { after: 400 },
+          }),
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [
+              new TextRun({ text: "Total: ", bold: true, size: 28 }),
+              new TextRun({
+                text: sale.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+                bold: true,
+                size: 28,
+              }),
+            ],
+          }),
+        ],
+      }],
+    });
+
+    Packer.toBlob(doc).then(blob => {
+      saveAs(blob, `recibo_${sale.id}.docx`);
+    });
+  };
+
   return (
     <Card>
        <CardHeader>
@@ -72,7 +134,7 @@ export default function SalesTable({ sales, products }: { sales: Sale[], product
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
                       <DropdownMenuItem>Ver Detalhes</DropdownMenuItem>
-                      <DropdownMenuItem>Gerar Recibo</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => generateReceipt(sale)}>Gerar Recibo</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

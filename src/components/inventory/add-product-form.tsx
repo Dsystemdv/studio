@@ -15,11 +15,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { updateProduct } from '@/lib/actions';
-import type { Product } from '@/lib/types';
+import { addProduct } from '@/lib/actions';
 
 const formSchema = z.object({
-  id: z.string(),
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   category: z.string().min(2, 'A categoria deve ter pelo menos 2 caracteres.'),
   stock: z.coerce.number().int().min(0, 'O estoque não pode ser negativo.'),
@@ -27,28 +25,26 @@ const formSchema = z.object({
   price: z.coerce.number().min(0, 'O preço de venda não pode ser negativo.'),
 });
 
-type EditProductFormProps = {
-  product: Product;
+type AddProductFormProps = {
   onFinished: () => void;
 };
 
-export default function EditProductForm({ product, onFinished }: EditProductFormProps) {
+export default function AddProductForm({ onFinished }: AddProductFormProps) {
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      id: product.id,
-      name: product.name,
-      category: product.category,
-      stock: product.stock,
-      costPrice: product.costPrice,
-      price: product.price,
+      name: '',
+      category: '',
+      stock: 0,
+      costPrice: 0,
+      price: 0,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const result = await updateProduct(values);
+    const result = await addProduct(values);
     if (result.success) {
       toast({
         title: 'Sucesso!',
@@ -136,9 +132,10 @@ export default function EditProductForm({ product, onFinished }: EditProductForm
             )}
           />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onFinished}>Cancelar</Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
+                {form.formState.isSubmitting ? 'Adicionando...' : 'Adicionar Produto'}
             </Button>
         </div>
       </form>

@@ -1,10 +1,9 @@
 import PageHeader from "@/components/page-header";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
 import SalesTable from "@/components/sales/sales-table";
 import { getSales, getProducts } from "@/lib/data";
 import ReportDownloader from "@/components/report-downloader";
 import type { Sale } from "@/lib/types";
+import AddSaleDialog from "@/components/sales/add-sale-dialog";
 
 export default async function SalesPage() {
   const sales = await getSales();
@@ -29,10 +28,7 @@ export default async function SalesPage() {
                 filename="relatorio_vendas.docx"
                 products={products}
             />
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Registrar Venda
-            </Button>
+            <AddSaleDialog products={products} />
           </div>
         }
       />

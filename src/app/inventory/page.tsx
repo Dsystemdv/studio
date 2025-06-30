@@ -1,10 +1,9 @@
 import PageHeader from "@/components/page-header";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
 import InventoryTable from "@/components/inventory/inventory-table";
 import { getProducts } from "@/lib/data";
 import ReportDownloader from "@/components/report-downloader";
 import type { Product } from "@/lib/types";
+import AddProductDialog from "@/components/inventory/add-product-dialog";
 
 export default async function InventoryPage() {
   const products = await getProducts();
@@ -29,10 +28,7 @@ export default async function InventoryPage() {
                 headers={productHeaders} 
                 filename="relatorio_inventario.docx"
             />
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Adicionar Produto
-            </Button>
+            <AddProductDialog />
           </div>
         }
       />

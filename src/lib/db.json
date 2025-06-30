@@ -1,4 +1,5 @@
-
 {
-  "info": "Este arquivo é um placeholder. A aplicação está atualmente usando dados de exemplo em memória de 'src/lib/data.ts'. Conecte ao seu banco de dados externo atualizando as funções em 'src/lib/data.ts' e 'src/lib/actions.ts'."
+  "products": [],
+  "sales": [],
+  "invoices": []
 }

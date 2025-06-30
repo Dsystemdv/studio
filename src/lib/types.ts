@@ -1,7 +1,7 @@
 export interface Product {
   id: string;
   name: string;
-  category: "Velas Aromáticas" | "Manteiga Corporal" | "Difusor de Aromas" | "Outros";
+  category: string;
   stock: number;
   costPrice: number;
   price: number;

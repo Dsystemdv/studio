@@ -14,13 +14,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { updateProduct } from '@/lib/actions';
 import type { Product } from '@/lib/types';
@@ -28,12 +21,7 @@ import type { Product } from '@/lib/types';
 const formSchema = z.object({
   id: z.string(),
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
-  category: z.enum([
-    'Velas Aromáticas',
-    'Manteiga Corporal',
-    'Difusor de Aromas',
-    'Outros',
-  ]),
+  category: z.string().min(2, 'A categoria deve ter pelo menos 2 caracteres.'),
   stock: z.coerce.number().int().min(0, 'O estoque não pode ser negativo.'),
   costPrice: z.coerce.number().min(0, 'O preço de custo não pode ser negativo.'),
   price: z.coerce.number().min(0, 'O preço de venda não pode ser negativo.'),
@@ -79,42 +67,34 @@ export default function EditProductForm({ product, onFinished }: EditProductForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome do Produto</FormLabel>
-              <FormControl>
-                <Input placeholder="Vela de Lavanda" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Categoria</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="grid grid-cols-2 gap-4">
+            <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Nome do Produto</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
+                    <Input placeholder="Vela de Lavanda" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Velas Aromáticas">Velas Aromáticas</SelectItem>
-                  <SelectItem value="Manteiga Corporal">Manteiga Corporal</SelectItem>
-                  <SelectItem value="Difusor de Aromas">Difusor de Aromas</SelectItem>
-                  <SelectItem value="Outros">Outros</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Categoria</FormLabel>
+                <FormControl>
+                    <Input placeholder="Ex: Velas Aromáticas" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        </div>
         <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}

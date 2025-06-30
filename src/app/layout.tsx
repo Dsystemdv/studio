@@ -10,7 +10,7 @@ const alegreya = Alegreya({
 });
 
 export const metadata: Metadata = {
-  title: "D'Manage",
+  title: "D'System",
   description: "Inventory and sales management for artisanal products.",
 };
 

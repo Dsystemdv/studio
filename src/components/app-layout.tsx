@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, LayoutDashboard, Receipt, ShoppingCart, Menu, Flame } from "lucide-react";
+import { Boxes, LayoutDashboard, Receipt, ShoppingCart, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -26,8 +26,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         href="#"
         className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
       >
-        <Flame className="h-4 w-4 transition-all group-hover:scale-110" />
-        <span className="sr-only">D'Manage</span>
+        <svg
+          className="h-4 w-4 transition-all group-hover:scale-110"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M8 4h5a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6H8V4z" />
+        </svg>
+        <span className="sr-only">D'System</span>
       </Link>
       <TooltipProvider>
         {navItems.map((item) => (
@@ -71,8 +82,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   href="#"
                   className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                 >
-                  <Flame className="h-5 w-5 transition-all group-hover:scale-110" />
-                  <span className="sr-only">D'Manage</span>
+                  <svg
+                    className="h-5 w-5 transition-all group-hover:scale-110"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M8 4h5a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6H8V4z" />
+                  </svg>
+                  <span className="sr-only">D'System</span>
                 </Link>
                 {navItems.map((item) => (
                   <Link

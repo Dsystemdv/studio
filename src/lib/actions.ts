@@ -25,7 +25,7 @@ export async function deleteSale(saleId: string) {
   } catch (error) {
     console.error('Failed to delete sale:', error);
     if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique suas regras de segurança do Firestore.' };
+        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique as regras de segurança do seu banco de dados Firestore.' };
     }
     return { success: false, message: 'Falha ao excluir a venda.' };
   }
@@ -52,7 +52,7 @@ export async function deleteInvoice(invoiceId: string) {
   } catch (error) {
     console.error('Failed to delete invoice:', error);
     if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique suas regras de segurança do Firestore.' };
+        return { success: false, message: 'Falha ao excluir: Permissão negada. Verifique as regras de segurança do seu banco de dados Firestore.' };
     }
     return { success: false, message: 'Falha ao excluir a nota de entrada.' };
   }

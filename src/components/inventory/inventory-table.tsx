@@ -16,20 +16,75 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal } from "lucide-react";
 import type { Product } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+import { deleteProduct } from "@/lib/actions";
+import EditProductForm from "./edit-product-form";
 
 export default function InventoryTable({ products }: { products: Product[] }) {
+  const { toast } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+
   const getStockBadgeVariant = (stock: number) => {
     if (stock < 10) return "destructive";
     if (stock < 30) return "secondary";
     return "default";
   };
+
+  const handleEditClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const handleDeleteConfirm = async () => {
+    if (!selectedProduct) return;
+
+    const result = await deleteProduct(selectedProduct.id);
+    if (result.success) {
+      toast({
+        title: "Sucesso!",
+        description: result.message,
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: result.message,
+      });
+    }
+    setIsDeleteDialogOpen(false);
+    setSelectedProduct(null);
+  };
   
   return (
+    <>
     <Card>
         <CardHeader>
             <CardTitle>Produtos</CardTitle>
@@ -74,8 +129,8 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Excluir</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditClick(product)}>Editar</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDeleteClick(product)}>Excluir</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -85,5 +140,30 @@ export default function InventoryTable({ products }: { products: Product[] }) {
         </Table>
       </CardContent>
     </Card>
+
+    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[480px]">
+            <DialogHeader>
+                <DialogTitle>Editar Produto</DialogTitle>
+            </DialogHeader>
+            {selectedProduct && <EditProductForm product={selectedProduct} onFinished={() => setIsEditDialogOpen(false)} />}
+        </DialogContent>
+    </Dialog>
+
+    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Isso excluirá permanentemente o produto do seu inventário.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setSelectedProduct(null)}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteConfirm}>Confirmar</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

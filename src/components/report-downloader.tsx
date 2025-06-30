@@ -18,7 +18,7 @@ export default function ReportDownloader<T extends object>({
   headers,
   filename,
   title,
-  buttonText = "Baixar Relatório (Word)",
+  buttonText = "Baixar Relatório",
 }: ReportDownloaderProps<T>) {
 
   const generateDoc = () => {

@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 
 // IMPORTANT: Replace this with your own Firebase project configuration!
 // You can find this in your Firebase project settings.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
   authDomain: "your-project-id.firebaseapp.com",
   projectId: "your-project-id",

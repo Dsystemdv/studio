@@ -28,15 +28,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       >
         <svg
           className="h-4 w-4 transition-all group-hover:scale-110"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
           viewBox="0 0 24 24"
+          fill="currentColor"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path d="M8 4h5a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6H8V4z" />
+          <text
+            x="50%"
+            y="55%"
+            dominantBaseline="middle"
+            textAnchor="middle"
+            fontFamily="Alegreya, serif"
+            fontSize="14"
+            fontWeight="bold"
+          >
+            D'S
+          </text>
         </svg>
         <span className="sr-only">D'System</span>
       </Link>
@@ -84,15 +90,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 >
                   <svg
                     className="h-5 w-5 transition-all group-hover:scale-110"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
                     viewBox="0 0 24 24"
+                    fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path d="M8 4h5a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6H8V4z" />
+                    <text
+                      x="50%"
+                      y="55%"
+                      dominantBaseline="middle"
+                      textAnchor="middle"
+                      fontFamily="Alegreya, serif"
+                      fontSize="14"
+                      fontWeight="bold"
+                    >
+                      D'S
+                    </text>
                   </svg>
                   <span className="sr-only">D'System</span>
                 </Link>

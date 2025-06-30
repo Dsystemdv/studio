@@ -35,7 +35,8 @@ const formSchema = z.object({
     'Outros',
   ]),
   stock: z.coerce.number().int().min(0, 'O estoque não pode ser negativo.'),
-  price: z.coerce.number().min(0, 'O preço não pode ser negativo.'),
+  costPrice: z.coerce.number().min(0, 'O preço de custo não pode ser negativo.'),
+  price: z.coerce.number().min(0, 'O preço de venda não pode ser negativo.'),
 });
 
 type EditProductFormProps = {
@@ -53,6 +54,7 @@ export default function EditProductForm({ product, onFinished }: EditProductForm
       name: product.name,
       category: product.category,
       stock: product.stock,
+      costPrice: product.costPrice,
       price: product.price,
     },
   });
@@ -113,7 +115,7 @@ export default function EditProductForm({ product, onFinished }: EditProductForm
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="stock"
@@ -129,10 +131,23 @@ export default function EditProductForm({ product, onFinished }: EditProductForm
           />
           <FormField
             control={form.control}
+            name="costPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custo (R$)</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.01" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Preço (R$)</FormLabel>
+                <FormLabel>Venda (R$)</FormLabel>
                 <FormControl>
                   <Input type="number" step="0.01" {...field} />
                 </FormControl>

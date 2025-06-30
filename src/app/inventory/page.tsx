@@ -13,7 +13,8 @@ export default async function InventoryPage() {
       name: "Nome",
       category: "Categoria",
       stock: "Estoque",
-      price: "Preço (R$)"
+      costPrice: "Preço de Custo (R$)",
+      price: "Preço de Venda (R$)"
   };
 
   return (

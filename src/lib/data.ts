@@ -20,6 +20,7 @@ const seedProducts: Product[] = [
     name: 'Vela de Lavanda',
     category: 'Velas Aromáticas',
     stock: 50,
+    costPrice: 15,
     price: 35,
   },
   {
@@ -27,6 +28,7 @@ const seedProducts: Product[] = [
     name: 'Vela de Baunilha',
     category: 'Velas Aromáticas',
     stock: 3,
+    costPrice: 15,
     price: 35,
   },
   {
@@ -34,6 +36,7 @@ const seedProducts: Product[] = [
     name: 'Manteiga de Karité',
     category: 'Manteiga Corporal',
     stock: 30,
+    costPrice: 20,
     price: 45,
   },
   {
@@ -41,6 +44,7 @@ const seedProducts: Product[] = [
     name: 'Difusor de Bambu',
     category: 'Difusor de Aromas',
     stock: 40,
+    costPrice: 25,
     price: 55,
   },
   {
@@ -48,6 +52,7 @@ const seedProducts: Product[] = [
     name: 'Vela de Canela',
     category: 'Velas Aromáticas',
     stock: 25,
+    costPrice: 18,
     price: 38,
   },
   {
@@ -55,6 +60,7 @@ const seedProducts: Product[] = [
     name: 'Manteiga de Cacau e Menta',
     category: 'Manteiga Corporal',
     stock: 8,
+    costPrice: 22,
     price: 48,
   },
   {
@@ -62,6 +68,7 @@ const seedProducts: Product[] = [
     name: 'Difusor de Flor de Cerejeira',
     category: 'Difusor de Aromas',
     stock: 22,
+    costPrice: 28,
     price: 60,
   },
 ];

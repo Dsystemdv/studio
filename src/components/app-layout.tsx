@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Logo from "./logo";
 import { cn } from "@/lib/utils";
+import LogoIcon from "./logo-icon";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -26,24 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         href="#"
         className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
       >
-        <svg
-          className="h-4 w-4 transition-all group-hover:scale-110"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <text
-            x="50%"
-            y="55%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fontFamily="Alegreya, serif"
-            fontSize="14"
-            fontWeight="bold"
-          >
-            D'S
-          </text>
-        </svg>
+        <LogoIcon className="h-4 w-4" />
         <span className="sr-only">D'System</span>
       </Link>
       <TooltipProvider>
@@ -88,24 +72,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   href="#"
                   className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                 >
-                  <svg
-                    className="h-5 w-5 transition-all group-hover:scale-110"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <text
-                      x="50%"
-                      y="55%"
-                      dominantBaseline="middle"
-                      textAnchor="middle"
-                      fontFamily="Alegreya, serif"
-                      fontSize="14"
-                      fontWeight="bold"
-                    >
-                      D'S
-                    </text>
-                  </svg>
+                  <LogoIcon className="h-5 w-5" />
                   <span className="sr-only">D'System</span>
                 </Link>
                 {navItems.map((item) => (

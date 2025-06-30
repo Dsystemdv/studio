@@ -133,54 +133,63 @@ const seedInvoices: Invoice[] = [
 ];
 
 
-async function seedCollection<T extends { id: string }>(
-  collectionName: string,
-  data: T[]
-) {
-  const collectionRef = collection(db, collectionName);
-  const snapshot = await getDocs(query(collectionRef));
-  if (snapshot.empty) {
-    console.log(`Seeding '${collectionName}' collection...`);
-    const batch = writeBatch(db);
-    data.forEach((item) => {
-      const docRef = doc(db, collectionName, item.id);
-      const { id, ...itemData } = item;
-      batch.set(docRef, itemData);
-    });
-    await batch.commit();
-  }
-}
-
-const seedDatabase = async () => {
-    if (!isFirebaseConfigured) {
-        console.warn("Firebase is not configured. Using local mock data. To use Firestore, please configure src/lib/firebase.ts and restart the server.");
-        return;
+let initializationPromise: Promise<void> | null = null;
+const initializeDatabase = () => {
+    if (initializationPromise) {
+        return initializationPromise;
     }
-    try {
-        await Promise.all([
-            seedCollection<Product>('products', seedProducts),
-            seedCollection<Sale>('sales', seedSales),
-            seedCollection<Invoice>('invoices', seedInvoices),
-        ]);
-    } catch (error) {
-        if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
-            console.error("Firestore Error: PERMISSION_DENIED. This is likely because the Firestore API is not enabled in your Google Cloud project, or your security rules are too restrictive. Please visit https://console.cloud.google.com/apis/library/firestore.googleapis.com for your project to enable it. Using local mock data as a fallback.");
-        } else {
-            console.error("An error occurred while seeding the database. Using local mock data as a fallback.", error);
+    initializationPromise = (async () => {
+        if (!isFirebaseConfigured) {
+            console.warn("Firebase is not configured. Using local mock data. To use Firestore, please configure src/lib/firebase.ts and restart the server.");
+            return;
         }
-    }
+        try {
+            const productsRef = collection(db, 'products');
+            const snapshot = await getDocs(productsRef);
+            if (snapshot.empty) {
+                console.log("Products collection is empty, seeding database...");
+                const batch = writeBatch(db);
+
+                seedProducts.forEach((item) => {
+                    const docRef = doc(db, 'products', item.id);
+                    const { id, ...itemData } = item;
+                    batch.set(docRef, itemData);
+                });
+
+                seedSales.forEach((item) => {
+                    const docRef = doc(db, 'sales', item.id);
+                    const { id, ...itemData } = item;
+                    batch.set(docRef, itemData);
+                });
+
+                seedInvoices.forEach((item) => {
+                    const docRef = doc(db, 'invoices', item.id);
+                    const { id, ...itemData } = item;
+                    batch.set(docRef, itemData);
+                });
+                
+                await batch.commit();
+                console.log("Database seeded successfully.");
+            }
+        } catch (error) {
+            if (error instanceof Error && error.message.includes("PERMISSION_DENIED")) {
+                console.error("Firestore Error: PERMISSION_DENIED. This is likely because the Firestore API is not enabled in your Google Cloud project, or your security rules are too restrictive. Using local mock data as a fallback.");
+            } else {
+                console.error("An error occurred while seeding the database. Using local mock data as a fallback.", error);
+            }
+        }
+    })();
+    return initializationPromise;
 };
 
-const seedPromise = seedDatabase();
-
 export const getProducts = async (): Promise<Product[]> => {
-  await seedPromise;
+  await initializeDatabase();
   if (!isFirebaseConfigured) return seedProducts;
 
   try {
     const productsCol = collection(db, 'products');
     const productSnapshot = await getDocs(productsCol);
-    if (productSnapshot.empty) return seedProducts; // Fallback if collection is empty
+    if (productSnapshot.empty) return seedProducts;
     return productSnapshot.docs.map(
       (doc) => ({ id: doc.id, ...doc.data() }) as Product
     );
@@ -191,13 +200,13 @@ export const getProducts = async (): Promise<Product[]> => {
 };
 
 export const getSales = async (): Promise<Sale[]> => {
-    await seedPromise;
+    await initializeDatabase();
     if (!isFirebaseConfigured) return seedSales;
 
     try {
         const salesCol = collection(db, 'sales');
         const salesSnapshot = await getDocs(salesCol);
-        if (salesSnapshot.empty) return seedSales; // Fallback
+        if (salesSnapshot.empty) return seedSales;
         return salesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Sale));
     } catch (error) {
         console.error("Failed to fetch sales from Firestore. Falling back to local data.", error);
@@ -206,13 +215,13 @@ export const getSales = async (): Promise<Sale[]> => {
 };
 
 export const getInvoices = async (): Promise<Invoice[]> => {
-    await seedPromise;
+    await initializeDatabase();
     if (!isFirebaseConfigured) return seedInvoices;
 
     try {
         const invoicesCol = collection(db, 'invoices');
         const invoicesSnapshot = await getDocs(invoicesCol);
-        if (invoicesSnapshot.empty) return seedInvoices; // Fallback
+        if (invoicesSnapshot.empty) return seedInvoices;
         return invoicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice));
     } catch (error) {
         console.error("Failed to fetch invoices from Firestore. Falling back to local data.", error);
@@ -223,7 +232,7 @@ export const getInvoices = async (): Promise<Invoice[]> => {
 export const getLowStockProducts = async (
   threshold = 10
 ): Promise<Product[]> => {
-    await seedPromise;
+    await initializeDatabase();
     if (!isFirebaseConfigured) {
         return seedProducts.filter(p => p.stock < threshold);
     }
@@ -239,7 +248,7 @@ export const getLowStockProducts = async (
 };
 
 export const getProductById = async (id: string): Promise<Product | undefined> => {
-    await seedPromise;
+    await initializeDatabase();
     if (!isFirebaseConfigured) {
         return seedProducts.find(p => p.id === id);
     }

@@ -133,7 +133,8 @@ export default function SalesTable({ sales, products }: { sales: Sale[], product
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                      <DropdownMenuItem>Ver Detalhes</DropdownMenuItem>
+                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                      <DropdownMenuItem>Excluir</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => generateReceipt(sale)}>Gerar Recibo</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

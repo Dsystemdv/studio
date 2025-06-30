@@ -2,10 +2,123 @@
 
 import { revalidatePath } from 'next/cache';
 import { getDb } from './firebase';
-import type { Product } from './types';
+import type { Invoice, Product, Sale } from './types';
+import { randomUUID } from 'crypto';
 
 // The 'db' is now a singleton promise from the repurposed firebase.ts file
 const db = getDb();
+
+export async function addProduct(productData: Omit<Product, 'id'>) {
+  try {
+    const conn = await db;
+    const newId = randomUUID();
+    await conn.run(
+      'INSERT INTO products (id, name, category, stock, costPrice, price) VALUES (?, ?, ?, ?, ?, ?)',
+      newId,
+      productData.name,
+      productData.category,
+      productData.stock,
+      productData.costPrice,
+      productData.price
+    );
+    revalidatePath('/inventory');
+    revalidatePath('/');
+    return { success: true, message: 'Produto adicionado com sucesso.' };
+  } catch (error) {
+    console.error('Falha ao adicionar o produto:', error);
+    return { success: false, message: 'Falha ao adicionar o produto.' };
+  }
+}
+
+export async function addSale(saleData: { items: { productId: string; quantity: number; price: number }[] }) {
+  if (!saleData.items || saleData.items.length === 0) {
+    return { success: false, message: 'A venda deve conter pelo menos um item.' };
+  }
+  
+  try {
+    const conn = await db;
+    await conn.run('BEGIN TRANSACTION');
+
+    const total = saleData.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const newId = randomUUID();
+    
+    await conn.run(
+      'INSERT INTO sales (id, date, items, total) VALUES (?, ?, ?, ?)',
+      newId,
+      new Date().toISOString(),
+      JSON.stringify(saleData.items),
+      total
+    );
+
+    for (const item of saleData.items) {
+      await conn.run(
+        'UPDATE products SET stock = stock - ? WHERE id = ?',
+        item.quantity,
+        item.productId
+      );
+    }
+    
+    await conn.run('COMMIT');
+
+    revalidatePath('/sales');
+    revalidatePath('/inventory');
+    revalidatePath('/');
+    return { success: true, message: 'Venda registrada com sucesso.' };
+  } catch (error) {
+    const conn = await db;
+    await conn.run('ROLLBACK');
+    console.error('Falha ao registrar a venda:', error);
+    return { success: false, message: 'Falha ao registrar a venda.' };
+  }
+}
+
+export async function addInvoice(invoiceData: Omit<Invoice, 'id' | 'total'>) {
+   if (!invoiceData.items || invoiceData.items.length === 0) {
+    return { success: false, message: 'A nota deve conter pelo menos um item.' };
+  }
+
+  try {
+    const conn = await db;
+    await conn.run('BEGIN TRANSACTION');
+
+    const total = invoiceData.items.reduce((acc, item) => acc + item.cost * item.quantity, 0);
+    const newId = randomUUID();
+
+    await conn.run(
+      'INSERT INTO invoices (id, date, supplier, items, total) VALUES (?, ?, ?, ?, ?)',
+      newId,
+      invoiceData.date,
+      invoiceData.supplier,
+      JSON.stringify(invoiceData.items),
+      total
+    );
+    
+    for (const item of invoiceData.items) {
+        const product = await conn.get('SELECT id FROM products WHERE name = ? COLLATE NOCASE', item.productName);
+        if (product) {
+            await conn.run(
+                'UPDATE products SET stock = stock + ? WHERE id = ?',
+                item.quantity,
+                product.id
+            );
+        } else {
+            console.warn(`Produto "${item.productName}" não encontrado no inventário. Estoque não atualizado.`);
+        }
+    }
+
+    await conn.run('COMMIT');
+
+    revalidatePath('/invoices');
+    revalidatePath('/inventory');
+    revalidatePath('/');
+    return { success: true, message: 'Nota de entrada adicionada com sucesso.' };
+  } catch (error) {
+    const conn = await db;
+    await conn.run('ROLLBACK');
+    console.error('Falha ao adicionar a nota de entrada:', error);
+    return { success: false, message: 'Falha ao adicionar a nota de entrada.' };
+  }
+}
 
 export async function deleteSale(saleId: string) {
   if (!saleId) {

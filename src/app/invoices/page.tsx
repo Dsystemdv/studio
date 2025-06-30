@@ -1,10 +1,9 @@
 import PageHeader from "@/components/page-header";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
 import InvoicesTable from "@/components/invoices/invoices-table";
 import { getInvoices } from "@/lib/data";
 import ReportDownloader from "@/components/report-downloader";
 import type { Invoice } from "@/lib/types";
+import AddInvoiceDialog from "@/components/invoices/add-invoice-dialog";
 
 export default async function InvoicesPage() {
   const invoices = await getInvoices();
@@ -28,10 +27,7 @@ export default async function InvoicesPage() {
               headers={invoiceHeaders} 
               filename="relatorio_notas_entrada.docx"
             />
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Adicionar Nota
-            </Button>
+            <AddInvoiceDialog />
           </div>
         }
       />

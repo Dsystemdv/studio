@@ -1,9 +1,10 @@
 "use client";
 
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, HeadingLevel, AlignmentType, WidthType } from "docx";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
+import type { Product } from "@/lib/types";
 
 type ReportDownloaderProps<T> = {
   data: T[];
@@ -11,6 +12,7 @@ type ReportDownloaderProps<T> = {
   filename: string;
   title: string;
   buttonText?: string;
+  products?: Product[];
 };
 
 export default function ReportDownloader<T extends object>({
@@ -19,6 +21,7 @@ export default function ReportDownloader<T extends object>({
   filename,
   title,
   buttonText = "Baixar Relatório",
+  products,
 }: ReportDownloaderProps<T>) {
 
   const generateDoc = () => {
@@ -29,65 +32,73 @@ export default function ReportDownloader<T extends object>({
 
     const headerKeys = Object.keys(headers);
 
-    const tableHeader = new TableRow({
-      children: headerKeys.map(key => 
-        new TableCell({
-          children: [new Paragraph({
-            children: [new TextRun({ text: headers[key], bold: true })],
-            alignment: AlignmentType.CENTER,
-          })],
-        })
-      ),
-      tableHeader: true,
-    });
-    
-    const dataRows = data.map(row => {
-      return new TableRow({
-        children: (headerKeys as (keyof T)[]).map(key => {
-          let cellValue = row[key];
-          let cellText: string;
+    const children: Paragraph[] = [
+      new Paragraph({
+        text: title,
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 },
+      }),
+      new Paragraph({
+        text: `Relatório gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 },
+      }),
+    ];
 
-          if (typeof cellValue === 'number' && (headers[key as string].toLowerCase().includes('preço') || headers[key as string].toLowerCase().includes('total'))) {
-            cellText = cellValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-          } else if (key === 'date' && typeof cellValue === 'string') {
-            cellText = new Date(cellValue).toLocaleDateString("pt-BR");
-          } else if (typeof cellValue === 'object' && cellValue !== null) {
-            cellText = JSON.stringify(cellValue);
-          } else {
-            cellText = String(cellValue);
-          }
-          
-          return new TableCell({
-            children: [new Paragraph(cellText)],
-          });
-        }),
+    data.forEach((row, index) => {
+      if (index > 0) {
+        children.push(new Paragraph({
+          text: "____________________",
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 200, after: 200 },
+        }));
+      }
+
+      headerKeys.forEach((key) => {
+        const label = headers[key as string];
+        const cellValue = row[key as keyof T];
+
+        if (key === 'items' && Array.isArray(cellValue)) {
+            children.push(new Paragraph({
+                children: [new TextRun({ text: `${label}:`, bold: true })],
+                spacing: { before: 100 }
+            }));
+            
+            cellValue.forEach((item: any) => {
+                let text = '';
+                if (item.productId && products) {
+                    const product = products.find(p => p.id === item.productId);
+                    text = `${item.quantity}x ${product?.name || 'Produto desconhecido'} - ${item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+                } else if (item.productName) { // Invoice Item
+                    text = `${item.quantity}x ${item.productName} - ${item.cost.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+                } else {
+                    text = JSON.stringify(item);
+                }
+                children.push(new Paragraph({ text, bullet: { level: 0 } }));
+            });
+
+        } else {
+            let cellText: string;
+            if (typeof cellValue === 'number' && (label.toLowerCase().includes('preço') || label.toLowerCase().includes('total'))) {
+                cellText = cellValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+            } else if (key === 'date' && typeof cellValue === 'string') {
+                cellText = new Date(cellValue).toLocaleDateString("pt-BR");
+            } else {
+                cellText = String(cellValue);
+            }
+            children.push(new Paragraph({
+                children: [
+                    new TextRun({ text: `${label}: `, bold: true }),
+                    new TextRun(cellText)
+                ]
+            }));
+        }
       });
     });
 
-    const table = new Table({
-      rows: [tableHeader, ...dataRows],
-      width: {
-        size: 100,
-        type: WidthType.PERCENTAGE,
-      },
-    });
-
     const doc = new Document({
-      sections: [{
-        children: [
-          new Paragraph({
-            text: title,
-            heading: HeadingLevel.HEADING_1,
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({
-            text: `Relatório gerado em: ${new Date().toLocaleDateString("pt-BR")}`,
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph(" "), // Spacer
-          table,
-        ],
-      }],
+      sections: [{ children }],
     });
 
     Packer.toBlob(doc).then(blob => {

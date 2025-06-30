@@ -27,6 +27,7 @@ export default async function SalesPage() {
                 data={sales} 
                 headers={saleHeaders} 
                 filename="relatorio_vendas.docx"
+                products={products}
             />
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />

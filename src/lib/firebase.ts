@@ -92,6 +92,31 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
             console.log("'invoices' table already exists.");
         }
 
+        // Check and create clients table
+        if (!await tableExists(db, 'clients')) {
+            console.log("Creating 'clients' table...");
+            await db.exec(`
+                CREATE TABLE clients (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    cpf TEXT NOT NULL,
+                    address TEXT NOT NULL,
+                    birthDate TEXT NOT NULL
+                );
+            `);
+            if (data.clients && data.clients.length > 0) {
+                const clientStmt = await db.prepare('INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)');
+                for (const client of data.clients) {
+                    await clientStmt.run(client.id, client.name, client.cpf, client.address, client.birthDate);
+                }
+                await clientStmt.finalize();
+                console.log("'clients' table created and seeded.");
+            }
+        } else {
+            console.log("'clients' table already exists.");
+        }
+
+
         console.log("Database verification and seeding complete.");
     } catch (error) {
         console.error("Failed during database setup:", error);

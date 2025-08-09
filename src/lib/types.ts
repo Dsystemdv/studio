@@ -30,8 +30,17 @@ export interface Invoice {
   total: number;
 }
 
+export interface Client {
+  id: string;
+  name: string;
+  cpf: string;
+  address: string;
+  birthDate: string;
+}
+
 export interface Database {
   products: Product[];
   sales: Sale[];
   invoices: Invoice[];
+  clients: Client[];
 }

@@ -1,5 +1,5 @@
 import { getDb } from './firebase';
-import type { Product, Sale, Invoice } from '@/lib/types';
+import type { Product, Sale, Invoice, Client } from '@/lib/types';
 
 // The 'db' is now a singleton promise from the repurposed firebase.ts file
 const db = getDb();
@@ -30,6 +30,12 @@ export const getInvoices = async (): Promise<Invoice[]> => {
     }));
 };
 
+export const getClients = async (): Promise<Client[]> => {
+    console.log("Buscando clientes do SQLite...");
+    const conn = await db;
+    return await conn.all('SELECT * FROM clients ORDER BY name');
+};
+
 export const getLowStockProducts = async (
   threshold = 10
 ): Promise<Product[]> => {
@@ -42,4 +48,10 @@ export const getProductById = async (id: string): Promise<Product | undefined> =
     console.log(`Buscando produto com ID ${id} do SQLite...`);
     const conn = await db;
     return await conn.get('SELECT * FROM products WHERE id = ?', id);
+};
+
+export const getClientById = async (id: string): Promise<Client | undefined> => {
+    console.log(`Buscando cliente com ID ${id} do SQLite...`);
+    const conn = await db;
+    return await conn.get('SELECT * FROM clients WHERE id = ?', id);
 };

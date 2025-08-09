@@ -13,6 +13,11 @@ async function tableExists(db: Awaited<ReturnType<typeof open>>, tableName: stri
   return !!result;
 }
 
+async function tableIsEmpty(db: Awaited<ReturnType<typeof open>>, tableName: string): Promise<boolean> {
+    const result = await db.get(`SELECT COUNT(*) as count FROM ${tableName}`);
+    return result.count === 0;
+}
+
 async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
     console.log("Checking and seeding database from db.json if needed...");
     try {
@@ -33,16 +38,16 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                     price REAL NOT NULL
                 );
             `);
+        }
+        
+        if (await tableIsEmpty(db, 'products') && data.products) {
+            console.log("Seeding 'products' table...");
             const productStmt = await db.prepare('INSERT INTO products (id, name, category, stock, costPrice, price) VALUES (?, ?, ?, ?, ?, ?)');
-            if (data.products) {
-              for (const product of data.products) {
-                  await productStmt.run(product.id, product.name, product.category, product.stock, product.costPrice, product.price);
-              }
+            for (const product of data.products) {
+                await productStmt.run(product.id, product.name, product.category, product.stock, product.costPrice, product.price);
             }
             await productStmt.finalize();
-            console.log("'products' table created and seeded.");
-        } else {
-            console.log("'products' table already exists.");
+            console.log("'products' table seeded.");
         }
 
         // Check and create sales table
@@ -56,17 +61,18 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                     total REAL NOT NULL
                 );
             `);
-             if (data.sales && data.sales.length > 0) {
-                const saleStmt = await db.prepare('INSERT INTO sales (id, date, items, total) VALUES (?, ?, ?, ?)');
-                for (const sale of data.sales) {
-                    await saleStmt.run(sale.id, sale.date, JSON.stringify(sale.items), sale.total);
-                }
-                await saleStmt.finalize();
-                console.log("'sales' table created and seeded.");
-            }
-        } else {
-            console.log("'sales' table already exists.");
         }
+        
+        if (await tableIsEmpty(db, 'sales') && data.sales) {
+            console.log("Seeding 'sales' table...");
+            const saleStmt = await db.prepare('INSERT INTO sales (id, date, items, total) VALUES (?, ?, ?, ?)');
+            for (const sale of data.sales) {
+                await saleStmt.run(sale.id, sale.date, JSON.stringify(sale.items), sale.total);
+            }
+            await saleStmt.finalize();
+            console.log("'sales' table seeded.");
+        }
+        
 
         // Check and create invoices table
         if (!await tableExists(db, 'invoices')) {
@@ -80,40 +86,41 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                     total REAL NOT NULL
                 );
             `);
-            if (data.invoices && data.invoices.length > 0) {
-                const invoiceStmt = await db.prepare('INSERT INTO invoices (id, date, supplier, items, total) VALUES (?, ?, ?, ?, ?)');
-                for (const invoice of data.invoices) {
-                    await invoiceStmt.run(invoice.id, invoice.date, invoice.supplier, JSON.stringify(invoice.items), invoice.total);
-                }
-                await invoiceStmt.finalize();
-                console.log("'invoices' table created and seeded.");
-            }
-        } else {
-            console.log("'invoices' table already exists.");
         }
 
-        // Drop and recreate clients table to ensure correct schema
-        console.log("Dropping 'clients' table if it exists to ensure schema is correct...");
-        await db.exec(`DROP TABLE IF EXISTS clients;`);
+        if (await tableIsEmpty(db, 'invoices') && data.invoices) {
+            console.log("Seeding 'invoices' table...");
+            const invoiceStmt = await db.prepare('INSERT INTO invoices (id, date, supplier, items, total) VALUES (?, ?, ?, ?, ?)');
+            for (const invoice of data.invoices) {
+                await invoiceStmt.run(invoice.id, invoice.date, invoice.supplier, JSON.stringify(invoice.items), invoice.total);
+            }
+            await invoiceStmt.finalize();
+            console.log("'invoices' table seeded.");
+        }
+
+        // Check and create clients table
+        if (!await tableExists(db, 'clients')) {
+            console.log("Creating 'clients' table...");
+            await db.exec(`
+                CREATE TABLE clients (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    cpf TEXT NOT NULL,
+                    address TEXT NOT NULL,
+                    city TEXT NOT NULL,
+                    birthDate TEXT NOT NULL
+                );
+            `);
+        }
         
-        console.log("Creating 'clients' table...");
-        await db.exec(`
-            CREATE TABLE clients (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                cpf TEXT NOT NULL,
-                address TEXT NOT NULL,
-                city TEXT NOT NULL,
-                birthDate TEXT NOT NULL
-            );
-        `);
-        if (data.clients && data.clients.length > 0) {
+        if (await tableIsEmpty(db, 'clients') && data.clients) {
+            console.log("Seeding 'clients' table...");
             const clientStmt = await db.prepare('INSERT INTO clients (id, name, cpf, address, city, birthDate) VALUES (?, ?, ?, ?, ?, ?)');
             for (const client of data.clients) {
                 await clientStmt.run(client.id, client.name, client.cpf, client.address, client.city || "Não informado", client.birthDate);
             }
             await clientStmt.finalize();
-            console.log("'clients' table created and seeded.");
+            console.log("'clients' table seeded.");
         }
 
 

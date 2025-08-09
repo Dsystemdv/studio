@@ -102,7 +102,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
                 <TableCell className="font-medium">{client.name}</TableCell>
                 <TableCell>{client.cpf}</TableCell>
                 <TableCell>{client.address}</TableCell>
-                <TableCell>{client.birthDate}</TableCell>
+                <TableCell>{new Date(client.birthDate).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -130,7 +130,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
             <DialogHeader>
                 <DialogTitle>Editar Cliente</DialogTitle>
             </DialogHeader>
-            {selectedClient && <EditClientForm client={selectedClient} onFinished={() => setIsEditDialogOpen(false)} />}
+            {selectedClient && <EditClientForm client={selectedClient} onFinished={() => { setIsEditDialogOpen(false); setSelectedClient(null); }} />}
         </DialogContent>
     </Dialog>
 

@@ -136,7 +136,8 @@ export default function EditProductForm({ product, onFinished }: EditProductForm
             )}
           />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onFinished}>Cancelar</Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </Button>

@@ -117,12 +117,11 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
             console.log("Seeding 'clients' table...");
             const clientStmt = await db.prepare('INSERT INTO clients (id, name, cpf, address, city, birthDate) VALUES (?, ?, ?, ?, ?, ?)');
             for (const client of data.clients) {
-                await clientStmt.run(client.id, client.name, client.cpf, client.address, client.city || "Não informado", client.birthDate);
+                await clientStmt.run(client.id, client.name, client.cpf, client.address, client.city, client.birthDate);
             }
             await clientStmt.finalize();
             console.log("'clients' table seeded.");
         }
-
 
         console.log("Database verification and seeding complete.");
     } catch (error) {
@@ -142,7 +141,6 @@ async function initializeDatabase() {
     
     return db;
 }
-
 
 let dbPromise: Promise<Awaited<ReturnType<typeof open>>> | null = null;
 

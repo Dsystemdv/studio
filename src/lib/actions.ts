@@ -221,11 +221,12 @@ export async function addClient(clientData: Omit<Client, 'id'>) {
     const conn = await db;
     const newId = randomUUID();
     await conn.run(
-      'INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO clients (id, name, cpf, address, city, birthDate) VALUES (?, ?, ?, ?, ?, ?)',
       newId,
       clientData.name,
       clientData.cpf,
       clientData.address,
+      clientData.city,
       clientData.birthDate
     );
     revalidatePath('/clients');
@@ -244,10 +245,11 @@ export async function updateClient(clientData: Client) {
   try {
     const conn = await db;
     const result = await conn.run(
-      'UPDATE clients SET name = ?, cpf = ?, address = ?, birthDate = ? WHERE id = ?',
+      'UPDATE clients SET name = ?, cpf = ?, address = ?, city = ?, birthDate = ? WHERE id = ?',
       clientData.name,
       clientData.cpf,
       clientData.address,
+      clientData.city,
       clientData.birthDate,
       clientData.id
     );

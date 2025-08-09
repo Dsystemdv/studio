@@ -20,6 +20,7 @@ const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   cpf: z.string().min(11, 'O CPF deve ter pelo menos 11 caracteres.'),
   address: z.string().min(5, 'O endereço deve ter pelo menos 5 caracteres.'),
+  city: z.string().min(2, 'A cidade deve ter pelo menos 2 caracteres.'),
   birthDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Data de nascimento inválida.',
   }),
@@ -38,6 +39,7 @@ export default function AddClientForm({ onFinished }: AddClientFormProps) {
       name: '',
       cpf: '',
       address: '',
+      city: '',
       birthDate: '',
     },
   });
@@ -103,19 +105,34 @@ export default function AddClientForm({ onFinished }: AddClientFormProps) {
             )}
           />
         </div>
-        <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Endereço</FormLabel>
-                <FormControl>
-                    <Input placeholder="Rua, Número, Bairro, Cidade - Estado" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
+        <div className="grid grid-cols-2 gap-4">
+            <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Endereço</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Rua, Número, Bairro" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
             />
+             <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Cidade</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Cidade - Estado" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onFinished}>
             Cancelar

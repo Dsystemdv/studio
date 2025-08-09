@@ -35,7 +35,7 @@ export const getInvoices = async (): Promise<Invoice[]> => {
 export const getClients = async (): Promise<Client[]> => {
     console.log("Buscando clientes do SQLite...");
     const conn = await db;
-    return await conn.all('SELECT id, name, cpf, address, birthDate FROM clients ORDER BY name');
+    return await conn.all('SELECT id, name, cpf, address, city, birthDate FROM clients ORDER BY name');
 };
 
 export const getLowStockProducts = async (

@@ -35,6 +35,7 @@ export interface Client {
   name: string;
   cpf: string;
   address: string;
+  city: string;
   birthDate: string;
 }
 

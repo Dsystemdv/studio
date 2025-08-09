@@ -77,8 +77,11 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
   };
 
   const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    // Adding UTC offset to prevent date changes
+    const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+    return adjustedDate.toLocaleDateString('pt-BR');
   };
 
   return (
@@ -93,8 +96,8 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>CPF</TableHead>
                 <TableHead>Endereço</TableHead>
+                <TableHead>Cidade</TableHead>
                 <TableHead>Data de Nasc.</TableHead>
                 <TableHead>
                   <span className="sr-only">Ações</span>
@@ -105,8 +108,8 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
               {clients.map((client) => (
                 <TableRow key={client.id}>
                   <TableCell className="font-medium">{client.name}</TableCell>
-                  <TableCell>{client.cpf}</TableCell>
                   <TableCell>{client.address}</TableCell>
+                  <TableCell>{client.city}</TableCell>
                   <TableCell>{formatDate(client.birthDate)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -119,7 +122,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleEditClick(client)}>Editar</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteClick(client)}>Excluir</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleDeleteClick(client); }}>Excluir</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

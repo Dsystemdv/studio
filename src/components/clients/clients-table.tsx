@@ -25,29 +25,60 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
+    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { deleteClient } from "@/lib/actions";
+import EditClientForm from "./edit-client-form";
 
 export default function ClientsTable({ clients }: { clients: Client[] }) {
   const { toast } = useToast();
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [selectedClient, setSelectedClient] = React.useState<Client | null>(null);
 
-  const handleEdit = (client: Client) => {
-    // TODO: Implement edit functionality
-    console.log("Edit client", client);
-    toast({ title: "Em breve", description: "A funcionalidade de editar cliente será implementada em breve."})
+  const handleEditClick = (client: Client) => {
+    setSelectedClient(client);
+    setIsEditDialogOpen(true);
   };
 
-  const handleDelete = (clientId: string) => {
-    // TODO: Implement delete functionality
-    console.log("Delete client", clientId);
-    toast({ title: "Em breve", description: "A funcionalidade de excluir cliente será implementada em breve."})
+  const handleDeleteClick = (client: Client) => {
+    setSelectedClient(client);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedClient) return;
+
+    const result = await deleteClient(selectedClient.id);
+    if (result.success) {
+      toast({
+        title: "Sucesso!",
+        description: result.message,
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: result.message,
+      });
+    }
+    setIsDeleteDialogOpen(false);
+    setSelectedClient(null);
   };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle>Clientes</CardTitle>
@@ -74,21 +105,21 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
                 <TableCell>{client.address}</TableCell>
                 <TableCell>{client.birthDate}</TableCell>
                 <TableCell>
-                  <AlertDialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleEdit(client)}>Editar</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(client.id)}>Excluir</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </AlertDialog>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                      <DropdownMenuItem onClick={() => handleEditClick(client)}>Editar</DropdownMenuItem>
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleDeleteClick(client); }}>Excluir</DropdownMenuItem>
+                      </AlertDialogTrigger>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
@@ -96,5 +127,30 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
         </Table>
       </CardContent>
     </Card>
+
+    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[480px]">
+            <DialogHeader>
+                <DialogTitle>Editar Cliente</DialogTitle>
+            </DialogHeader>
+            {selectedClient && <EditClientForm client={selectedClient} onFinished={() => setIsEditDialogOpen(false)} />}
+        </DialogContent>
+    </Dialog>
+
+    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Isso excluirá permanentemente o cliente.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setSelectedClient(null)}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteConfirm}>Confirmar</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

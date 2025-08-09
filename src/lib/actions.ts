@@ -140,6 +140,55 @@ export async function addClient(clientData: Omit<Client, 'id'>) {
   }
 }
 
+export async function updateClient(clientData: Client) {
+  if (!clientData || !clientData.id) {
+    return { success: false, message: 'Dados do cliente inválidos.' };
+  }
+
+  try {
+    const conn = await db;
+    const result = await conn.run(
+      'UPDATE clients SET name = ?, cpf = ?, address = ?, birthDate = ? WHERE id = ?',
+      clientData.name,
+      clientData.cpf,
+      clientData.address,
+      clientData.birthDate,
+      clientData.id
+    );
+
+    if (result.changes === 0) {
+      return { success: false, message: 'Cliente não encontrado.' };
+    }
+
+    revalidatePath('/clients');
+    return { success: true, message: 'Cliente atualizado com sucesso.' };
+  } catch (error) {
+    console.error('Falha ao atualizar o cliente:', error);
+    return { success: false, message: 'Falha ao atualizar o cliente.' };
+  }
+}
+
+export async function deleteClient(clientId: string) {
+  if (!clientId) {
+    return { success: false, message: 'ID do cliente inválido.' };
+  }
+
+  try {
+    const conn = await db;
+    const result = await conn.run('DELETE FROM clients WHERE id = ?', clientId);
+
+    if (result.changes === 0) {
+      return { success: false, message: 'Cliente não encontrado.' };
+    }
+
+    revalidatePath('/clients');
+    return { success: true, message: 'Cliente excluído com sucesso.' };
+  } catch (error) {
+    console.error('Falha ao excluir o cliente:', error);
+    return { success: false, message: 'Falha ao excluir o cliente.' };
+  }
+}
+
 export async function deleteSale(saleId: string) {
   if (!saleId) {
     return { success: false, message: 'ID da venda inválido.' };

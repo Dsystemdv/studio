@@ -33,8 +33,9 @@ export interface Invoice {
 export interface Client {
     id: string;
     name: string;
-    email: string | null;
-    phone: string | null;
+    cpf: string;
+    address: string;
+    birthDate: string;
 }
 
 export interface Database {

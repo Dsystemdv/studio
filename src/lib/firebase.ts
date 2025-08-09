@@ -91,14 +91,15 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                 CREATE TABLE clients (
                     id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
-                    email TEXT,
-                    phone TEXT
+                    cpf TEXT NOT NULL,
+                    address TEXT NOT NULL,
+                    birthDate TEXT NOT NULL
                 );
             `);
             if (data.clients && data.clients.length > 0) {
-                const clientStmt = await db.prepare('INSERT INTO clients (id, name, email, phone) VALUES (?, ?, ?, ?)');
+                const clientStmt = await db.prepare('INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)');
                 for (const client of data.clients) {
-                    await clientStmt.run(client.id, client.name, client.email, client.phone);
+                    await clientStmt.run(client.id, client.name, client.cpf, client.address, client.birthDate);
                 }
                 await clientStmt.finalize();
                 console.log("'clients' table created and seeded.");

@@ -58,8 +58,9 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Telefone</TableHead>
+              <TableHead>CPF</TableHead>
+              <TableHead>Endereço</TableHead>
+              <TableHead>Data de Nascimento</TableHead>
               <TableHead>
                 <span className="sr-only">Ações</span>
               </TableHead>
@@ -69,8 +70,9 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
             {clients.map((client) => (
               <TableRow key={client.id}>
                 <TableCell className="font-medium">{client.name}</TableCell>
-                <TableCell>{client.email || 'N/A'}</TableCell>
-                <TableCell>{client.phone || 'N/A'}</TableCell>
+                <TableCell>{client.cpf}</TableCell>
+                <TableCell>{client.address}</TableCell>
+                <TableCell>{new Date(client.birthDate).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}</TableCell>
                 <TableCell>
                   <AlertDialog>
                     <DropdownMenu>

@@ -125,11 +125,12 @@ export async function addClient(clientData: Omit<Client, 'id'>) {
     const conn = await db;
     const newId = randomUUID();
     await conn.run(
-      'INSERT INTO clients (id, name, email, phone) VALUES (?, ?, ?, ?)',
+      'INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)',
       newId,
       clientData.name,
-      clientData.email,
-      clientData.phone
+      clientData.cpf,
+      clientData.address,
+      clientData.birthDate
     );
     revalidatePath('/clients');
     return { success: true, message: 'Cliente adicionado com sucesso.' };

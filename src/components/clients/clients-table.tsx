@@ -96,6 +96,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
+                <TableHead>CPF</TableHead>
                 <TableHead>Endereço</TableHead>
                 <TableHead>Cidade</TableHead>
                 <TableHead>Data de Nasc.</TableHead>
@@ -108,6 +109,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
               {clients.map((client) => (
                 <TableRow key={client.id}>
                   <TableCell className="font-medium">{client.name}</TableCell>
+                  <TableCell>{client.cpf}</TableCell>
                   <TableCell>{client.address}</TableCell>
                   <TableCell>{client.city}</TableCell>
                   <TableCell>{formatDate(client.birthDate)}</TableCell>

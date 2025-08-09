@@ -39,6 +39,8 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
             }
             await productStmt.finalize();
             console.log("'products' table created and seeded.");
+        } else {
+            console.log("'products' table already exists.");
         }
 
         // Check and create sales table
@@ -60,6 +62,8 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                 await saleStmt.finalize();
                 console.log("'sales' table created and seeded.");
             }
+        } else {
+            console.log("'sales' table already exists.");
         }
 
         // Check and create invoices table
@@ -82,6 +86,8 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                 await invoiceStmt.finalize();
                 console.log("'invoices' table created and seeded.");
             }
+        } else {
+            console.log("'invoices' table already exists.");
         }
 
         // Check and create clients table
@@ -104,35 +110,35 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                 await clientStmt.finalize();
                 console.log("'clients' table created and seeded.");
             }
+        } else {
+            console.log("'clients' table already exists.");
         }
 
         console.log("Database verification and seeding complete.");
     } catch (error) {
         console.error("Failed during database setup:", error);
-        // We don't delete the file anymore to avoid data loss
-        // await fs.unlink(DB_FILE).catch(() => {});
         throw error;
     }
 }
 
-async function getDbConnection() {
+async function initializeDatabase() {
     const db = await open({
         filename: DB_FILE,
         driver: sqlite3.Database
     });
     
-    // Seed the database with all necessary tables if they don't exist
+    await db.exec('PRAGMA foreign_keys = ON;');
     await seedDatabase(db);
     
-    await db.exec('PRAGMA foreign_keys = ON;');
-
     return db;
 }
 
+
 let dbPromise: Promise<Awaited<ReturnType<typeof open>>> | null = null;
+
 export function getDb() {
   if (!dbPromise) {
-    dbPromise = getDbConnection();
+    dbPromise = initializeDatabase();
   }
   return dbPromise;
 }

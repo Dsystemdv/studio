@@ -15,20 +15,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addClient } from '@/lib/actions';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
-import { Calendar } from '../ui/calendar';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
   cpf: z.string().min(11, 'O CPF deve ter 11 caracteres.'),
   address: z.string().min(5, 'O endereço deve ter pelo menos 5 caracteres.'),
-  birthDate: z.date({
-    required_error: 'A data de nascimento é obrigatória.',
-  }),
+  birthDate: z.string().min(1, 'A data de nascimento é obrigatória.'),
 });
 
 type AddClientFormProps = {
@@ -44,14 +36,12 @@ export default function AddClientForm({ onFinished }: AddClientFormProps) {
       name: '',
       cpf: '',
       address: '',
+      birthDate: '',
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const result = await addClient({
-      ...values,
-      birthDate: values.birthDate.toISOString(),
-    });
+    const result = await addClient(values);
     if (result.success) {
       toast({
         title: 'Sucesso!',
@@ -115,39 +105,11 @@ export default function AddClientForm({ onFinished }: AddClientFormProps) {
           control={form.control}
           name="birthDate"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem>
               <FormLabel>Data de Nascimento</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={'outline'}
-                      className={cn(
-                        'pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, 'PPP', { locale: ptBR })
-                      ) : (
-                        <span>Escolha uma data</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date('1900-01-01')
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <Input placeholder="DD/MM/AAAA" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

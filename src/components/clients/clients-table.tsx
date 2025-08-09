@@ -72,7 +72,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
                 <TableCell className="font-medium">{client.name}</TableCell>
                 <TableCell>{client.cpf}</TableCell>
                 <TableCell>{client.address}</TableCell>
-                <TableCell>{new Date(client.birthDate).toLocaleDateString("pt-BR", { timeZone: 'UTC' })}</TableCell>
+                <TableCell>{client.birthDate}</TableCell>
                 <TableCell>
                   <AlertDialog>
                     <DropdownMenu>

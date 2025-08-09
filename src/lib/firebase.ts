@@ -40,6 +40,13 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                 items TEXT NOT NULL,
                 total REAL NOT NULL
             );
+
+            CREATE TABLE clients (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT,
+                phone TEXT
+            );
         `);
 
         // Seed products
@@ -66,6 +73,16 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
             }
             await invoiceStmt.finalize();
         }
+
+        // Seed clients (if any)
+        if (data.clients && data.clients.length > 0) {
+            const clientStmt = await db.prepare('INSERT INTO clients (id, name, email, phone) VALUES (?, ?, ?, ?)');
+            for (const client of data.clients) {
+                await clientStmt.run(client.id, client.name, client.email, client.phone);
+            }
+            await clientStmt.finalize();
+        }
+
 
         console.log("Database seeded successfully.");
     } catch (error) {

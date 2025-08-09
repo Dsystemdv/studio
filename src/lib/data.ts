@@ -1,5 +1,5 @@
 import { getDb } from './firebase';
-import type { Product, Sale, Invoice } from '@/lib/types';
+import type { Product, Sale, Invoice, Client } from '@/lib/types';
 
 // The 'db' is now a singleton promise from the repurposed firebase.ts file
 const db = getDb();
@@ -28,6 +28,12 @@ export const getInvoices = async (): Promise<Invoice[]> => {
         ...invoice,
         items: JSON.parse(invoice.items)
     }));
+};
+
+export const getClients = async (): Promise<Client[]> => {
+    console.log("Buscando clientes do SQLite...");
+    const conn = await db;
+    return await conn.all('SELECT * FROM clients ORDER BY name');
 };
 
 export const getLowStockProducts = async (

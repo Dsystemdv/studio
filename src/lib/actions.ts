@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getDb } from './firebase';
-import type { Invoice, Product, Sale } from './types';
+import type { Invoice, Product, Sale, Client } from './types';
 import { randomUUID } from 'crypto';
 
 // The 'db' is now a singleton promise from the repurposed firebase.ts file
@@ -117,6 +117,25 @@ export async function addInvoice(invoiceData: Omit<Invoice, 'id' | 'total'>) {
     await conn.run('ROLLBACK');
     console.error('Falha ao adicionar a nota de entrada:', error);
     return { success: false, message: 'Falha ao adicionar a nota de entrada.' };
+  }
+}
+
+export async function addClient(clientData: Omit<Client, 'id'>) {
+  try {
+    const conn = await db;
+    const newId = randomUUID();
+    await conn.run(
+      'INSERT INTO clients (id, name, email, phone) VALUES (?, ?, ?, ?)',
+      newId,
+      clientData.name,
+      clientData.email,
+      clientData.phone
+    );
+    revalidatePath('/clients');
+    return { success: true, message: 'Cliente adicionado com sucesso.' };
+  } catch (error) {
+    console.error('Falha ao adicionar o cliente:', error);
+    return { success: false, message: 'Falha ao adicionar o cliente.' };
   }
 }
 

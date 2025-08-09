@@ -25,7 +25,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
     Dialog,
@@ -115,9 +114,7 @@ export default function ClientsTable({ clients }: { clients: Client[] }) {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
                       <DropdownMenuItem onClick={() => handleEditClick(client)}>Editar</DropdownMenuItem>
-                      <AlertDialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleDeleteClick(client); }}>Excluir</DropdownMenuItem>
-                      </AlertDialogTrigger>
+                      <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleDeleteClick(client); }}>Excluir</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   devIndicators: {
     allowedDevOrigins: ['*.cloudworkstations.dev'],
   },
-  serverComponentsExternalPackages: ['sqlite3'],
+ 
 };
 
 export default nextConfig;

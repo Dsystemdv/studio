@@ -18,9 +18,11 @@ import { addClient } from '@/lib/actions';
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
-  cpf: z.string().min(11, 'O CPF deve ter 11 caracteres.'),
+  cpf: z.string().min(11, 'O CPF deve ter 11 caracteres.').max(14, 'O CPF deve ter no máximo 14 caracteres.'),
   address: z.string().min(5, 'O endereço deve ter pelo menos 5 caracteres.'),
-  birthDate: z.string().min(1, 'A data de nascimento é obrigatória.'),
+  birthDate: z.string().refine((date) => /^\d{4}-\d{2}-\d{2}$/.test(date), {
+    message: "Use o formato AAAA-MM-DD.",
+  }),
 });
 
 type AddClientFormProps = {
@@ -48,6 +50,7 @@ export default function AddClientForm({ onFinished }: AddClientFormProps) {
         description: result.message,
       });
       onFinished();
+      form.reset();
     } else {
       toast({
         variant: 'destructive',
@@ -108,7 +111,7 @@ export default function AddClientForm({ onFinished }: AddClientFormProps) {
             <FormItem>
               <FormLabel>Data de Nascimento</FormLabel>
               <FormControl>
-                <Input placeholder="DD/MM/AAAA" {...field} />
+                <Input type="date" placeholder="AAAA-MM-DD" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

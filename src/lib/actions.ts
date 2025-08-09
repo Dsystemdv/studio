@@ -124,13 +124,15 @@ export async function addClient(clientData: Omit<Client, 'id'>) {
   try {
     const conn = await db;
     const newId = randomUUID();
+    // Ensure birthDate is in ISO format for consistency
+    const birthDate = new Date(clientData.birthDate).toISOString();
     await conn.run(
       'INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)',
       newId,
       clientData.name,
       clientData.cpf,
       clientData.address,
-      clientData.birthDate
+      birthDate
     );
     revalidatePath('/clients');
     return { success: true, message: 'Cliente adicionado com sucesso.' };
@@ -147,12 +149,14 @@ export async function updateClient(clientData: Client) {
 
   try {
     const conn = await db;
+    // Ensure birthDate is in ISO format for consistency
+    const birthDate = new Date(clientData.birthDate).toISOString();
     const result = await conn.run(
       'UPDATE clients SET name = ?, cpf = ?, address = ?, birthDate = ? WHERE id = ?',
       clientData.name,
       clientData.cpf,
       clientData.address,
-      clientData.birthDate,
+      birthDate,
       clientData.id
     );
 

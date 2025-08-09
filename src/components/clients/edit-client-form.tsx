@@ -20,9 +20,11 @@ import type { Client } from '@/lib/types';
 const formSchema = z.object({
   id: z.string(),
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres.'),
-  cpf: z.string().min(11, 'O CPF deve ter 11 caracteres.'),
+  cpf: z.string().min(11, 'O CPF deve ter 11 caracteres.').max(14, 'O CPF deve ter no máximo 14 caracteres.'),
   address: z.string().min(5, 'O endereço deve ter pelo menos 5 caracteres.'),
-  birthDate: z.string().min(1, 'A data de nascimento é obrigatória.'),
+  birthDate: z.string().refine((date) => /^\d{4}-\d{2}-\d{2}$/.test(date), {
+    message: "Use o formato AAAA-MM-DD.",
+  }),
 });
 
 type EditClientFormProps = {
@@ -40,7 +42,7 @@ export default function EditClientForm({ client, onFinished }: EditClientFormPro
       name: client.name,
       cpf: client.cpf,
       address: client.address,
-      birthDate: client.birthDate,
+      birthDate: client.birthDate.split('T')[0], // Format to YYYY-MM-DD for the input
     },
   });
 
@@ -112,7 +114,7 @@ export default function EditClientForm({ client, onFinished }: EditClientFormPro
             <FormItem>
               <FormLabel>Data de Nascimento</FormLabel>
               <FormControl>
-                <Input placeholder="DD/MM/AAAA" {...field} />
+                <Input type="date" placeholder="AAAA-MM-DD" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

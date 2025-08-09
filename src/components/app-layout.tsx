@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, LayoutDashboard, Receipt, ShoppingCart, Menu, Users } from "lucide-react";
+import { Boxes, LayoutDashboard, Receipt, ShoppingCart, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -16,7 +16,6 @@ const navItems = [
   { href: "/inventory", label: "Inventário", icon: Boxes },
   { href: "/sales", label: "Vendas", icon: ShoppingCart },
   { href: "/invoices", label: "Notas", icon: Receipt },
-  { href: "/clients", label: "Clientes", icon: Users },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

@@ -116,21 +116,5 @@
       ],
       "total": 125
     }
-  ],
-  "clients": [
-    {
-      "id": "client-1",
-      "name": "Maria Silva",
-      "cpf": "123.456.789-00",
-      "address": "Rua das Flores, 123, São Paulo, SP",
-      "birthDate": "1990-05-15T00:00:00Z"
-    },
-    {
-      "id": "client-2",
-      "name": "João Pereira",
-      "cpf": "987.654.321-00",
-      "address": "Avenida Central, 456, Rio de Janeiro, RJ",
-      "birthDate": "1985-11-22T00:00:00Z"
-    }
   ]
 }

@@ -18,7 +18,7 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
     try {
         const dbJsonPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
         const fileContent = await fs.readFile(dbJsonPath, 'utf-8');
-        const data: Database = JSON.parse(fileContent);
+        const data: Partial<Database> = JSON.parse(fileContent);
 
         // Check and create products table
         if (!await tableExists(db, 'products')) {
@@ -34,8 +34,10 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
                 );
             `);
             const productStmt = await db.prepare('INSERT INTO products (id, name, category, stock, costPrice, price) VALUES (?, ?, ?, ?, ?, ?)');
-            for (const product of data.products) {
-                await productStmt.run(product.id, product.name, product.category, product.stock, product.costPrice, product.price);
+            if (data.products) {
+              for (const product of data.products) {
+                  await productStmt.run(product.id, product.name, product.category, product.stock, product.costPrice, product.price);
+              }
             }
             await productStmt.finalize();
             console.log("'products' table created and seeded.");
@@ -88,30 +90,6 @@ async function seedDatabase(db: Awaited<ReturnType<typeof open>>) {
             }
         } else {
             console.log("'invoices' table already exists.");
-        }
-
-        // Check and create clients table
-        if (!await tableExists(db, 'clients')) {
-            console.log("Creating 'clients' table...");
-            await db.exec(`
-                CREATE TABLE clients (
-                    id TEXT PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    cpf TEXT NOT NULL,
-                    address TEXT NOT NULL,
-                    birthDate TEXT NOT NULL
-                );
-            `);
-            if (data.clients && data.clients.length > 0) {
-                const clientStmt = await db.prepare('INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)');
-                for (const client of data.clients) {
-                    await clientStmt.run(client.id, client.name, client.cpf, client.address, client.birthDate);
-                }
-                await clientStmt.finalize();
-                console.log("'clients' table created and seeded.");
-            }
-        } else {
-            console.log("'clients' table already exists.");
         }
 
         console.log("Database verification and seeding complete.");

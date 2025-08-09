@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getDb } from './firebase';
-import type { Invoice, Product, Sale, Client } from './types';
+import type { Invoice, Product, Sale } from './types';
 import { randomUUID } from 'crypto';
 
 // The 'db' is now a singleton promise from the repurposed firebase.ts file
@@ -117,79 +117,6 @@ export async function addInvoice(invoiceData: Omit<Invoice, 'id' | 'total'>) {
     await conn.run('ROLLBACK');
     console.error('Falha ao adicionar a nota de entrada:', error);
     return { success: false, message: 'Falha ao adicionar a nota de entrada.' };
-  }
-}
-
-export async function addClient(clientData: Omit<Client, 'id'>) {
-  try {
-    const conn = await db;
-    const newId = randomUUID();
-    // Ensure birthDate is in ISO format for consistency
-    const birthDate = new Date(clientData.birthDate).toISOString();
-    await conn.run(
-      'INSERT INTO clients (id, name, cpf, address, birthDate) VALUES (?, ?, ?, ?, ?)',
-      newId,
-      clientData.name,
-      clientData.cpf,
-      clientData.address,
-      birthDate
-    );
-    revalidatePath('/clients');
-    return { success: true, message: 'Cliente adicionado com sucesso.' };
-  } catch (error) {
-    console.error('Falha ao adicionar o cliente:', error);
-    return { success: false, message: 'Falha ao adicionar o cliente.' };
-  }
-}
-
-export async function updateClient(clientData: Client) {
-  if (!clientData || !clientData.id) {
-    return { success: false, message: 'Dados do cliente inválidos.' };
-  }
-
-  try {
-    const conn = await db;
-    // Ensure birthDate is in ISO format for consistency
-    const birthDate = new Date(clientData.birthDate).toISOString();
-    const result = await conn.run(
-      'UPDATE clients SET name = ?, cpf = ?, address = ?, birthDate = ? WHERE id = ?',
-      clientData.name,
-      clientData.cpf,
-      clientData.address,
-      birthDate,
-      clientData.id
-    );
-
-    if (result.changes === 0) {
-      return { success: false, message: 'Cliente não encontrado.' };
-    }
-
-    revalidatePath('/clients');
-    return { success: true, message: 'Cliente atualizado com sucesso.' };
-  } catch (error) {
-    console.error('Falha ao atualizar o cliente:', error);
-    return { success: false, message: 'Falha ao atualizar o cliente.' };
-  }
-}
-
-export async function deleteClient(clientId: string) {
-  if (!clientId) {
-    return { success: false, message: 'ID do cliente inválido.' };
-  }
-
-  try {
-    const conn = await db;
-    const result = await conn.run('DELETE FROM clients WHERE id = ?', clientId);
-
-    if (result.changes === 0) {
-      return { success: false, message: 'Cliente não encontrado.' };
-    }
-
-    revalidatePath('/clients');
-    return { success: true, message: 'Cliente excluído com sucesso.' };
-  } catch (error) {
-    console.error('Falha ao excluir o cliente:', error);
-    return { success: false, message: 'Falha ao excluir o cliente.' };
   }
 }
 

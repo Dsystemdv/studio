@@ -38,13 +38,6 @@ export const getClients = async (): Promise<Client[]> => {
     return await conn.all('SELECT id, name, cpf, address, city, birthDate FROM clients ORDER BY name');
 };
 
-export const getBirthdaysOfTheMonth = async (): Promise<Client[]> => {
-    console.log("Buscando aniversariantes do mês do SQLite...");
-    const conn = await db;
-    return await conn.all("SELECT * FROM clients WHERE strftime('%m', birthDate) = strftime('%m', 'now') ORDER BY strftime('%d', birthDate)");
-};
-
-
 export const getLowStockProducts = async (
   threshold = 10
 ): Promise<Product[]> => {

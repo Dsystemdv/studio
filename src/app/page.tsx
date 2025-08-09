@@ -2,8 +2,7 @@ import PageHeader from "@/components/page-header";
 import StatsCards from "@/components/dashboard/stats-cards";
 import SalesChart from "@/components/dashboard/sales-chart";
 import LowStockAlert from "@/components/dashboard/low-stock-alert";
-import { getLowStockProducts, getSales, getProducts, getBirthdaysOfTheMonth } from "@/lib/data";
-import BirthdaysAlert from "@/components/dashboard/birthdays-alert";
+import { getLowStockProducts, getSales, getProducts } from "@/lib/data";
 
 export default async function Dashboard() {
   const stats = {
@@ -23,7 +22,6 @@ export default async function Dashboard() {
 
   const salesData = await getSales();
   const lowStockProducts = await getLowStockProducts();
-  const birthdayClients = await getBirthdaysOfTheMonth();
 
   return (
     <div className="flex flex-col gap-8">
@@ -36,7 +34,6 @@ export default async function Dashboard() {
           </div>
           <div className="space-y-4">
             <LowStockAlert products={lowStockProducts} />
-            <BirthdaysAlert clients={birthdayClients} />
           </div>
         </div>
       </main>

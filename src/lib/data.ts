@@ -1,3 +1,5 @@
+'use server';
+
 import { getDb } from './firebase';
 import type { Product, Sale, Invoice, Client } from '@/lib/types';
 

@@ -48,7 +48,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
           <div className="text-2xl font-bold">
             {totalStockValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
           </div>
-          <p className="text-xs text-muted-foreground">Valor total do inventário (custo)</p>
+          <p className="text-xs text-muted-foreground">Valor total do inventário (venda)</p>
         </CardContent>
       </Card>
       <Card>

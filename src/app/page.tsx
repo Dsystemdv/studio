@@ -21,7 +21,7 @@ export default async function Dashboard() {
       })
       .reduce((acc, sale) => acc + sale.total, 0),
     totalProducts: products.length,
-    totalStockValue: products.reduce((acc, p) => acc + (p.costPrice * p.stock), 0),
+    totalStockValue: products.reduce((acc, p) => acc + (p.price * p.stock), 0),
   };
 
   const lowStockProducts = await getLowStockProducts();

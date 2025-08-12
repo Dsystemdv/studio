@@ -37,7 +37,7 @@ export default function AddProductForm({ onFinished }: AddProductFormProps) {
     defaultValues: {
       name: '',
       category: '',
-      stock: 0,
+      stock: 1,
       costPrice: 0,
       price: 0,
     },

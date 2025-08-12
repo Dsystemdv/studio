@@ -24,7 +24,7 @@ export default async function Dashboard() {
     totalStockValue: products.reduce((acc, p) => acc + (p.price * p.stock), 0),
   };
 
-  const lowStockProducts = await getLowStockProducts();
+  const lowStockProducts = await getLowStockProducts(3);
 
   return (
     <div className="flex flex-col gap-8">

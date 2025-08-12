@@ -2,12 +2,17 @@ import PageHeader from "@/components/page-header";
 import StatsCards from "@/components/dashboard/stats-cards";
 import SalesChart from "@/components/dashboard/sales-chart";
 import LowStockAlert from "@/components/dashboard/low-stock-alert";
-import { getLowStockProducts, getSales, getProducts } from "@/lib/data";
+import { getLowStockProducts, getSales, getProducts, getClients } from "@/lib/data";
+import BirthdaysAlert from "@/components/dashboard/birthdays-alert";
 
 export default async function Dashboard() {
+  const products = await getProducts();
+  const sales = await getSales();
+  const clients = await getClients();
+
   const stats = {
-    totalRevenue: (await getSales()).reduce((acc, sale) => acc + sale.total, 0),
-    salesThisMonth: (await getSales())
+    totalRevenue: sales.reduce((acc, sale) => acc + sale.total, 0),
+    salesThisMonth: sales
       .filter((sale) => {
         const saleDate = new Date(sale.date);
         const today = new Date();
@@ -17,23 +22,33 @@ export default async function Dashboard() {
         );
       })
       .reduce((acc, sale) => acc + sale.total, 0),
-    totalProducts: (await getProducts()).length,
+    totalProducts: products.length,
+    totalStockValue: products.reduce((acc, p) => acc + (p.price * p.stock), 0),
   };
 
-  const salesData = await getSales();
-  const lowStockProducts = await getLowStockProducts();
+  const lowStockProducts = await getLowStockProducts(3);
+
+  const birthdaysOfTheMonth = clients.filter(client => {
+    const today = new Date();
+    const birthDate = new Date(client.birthDate);
+    // Adjust for timezone offset to prevent issues
+    const adjustedBirthDate = new Date(birthDate.valueOf() + birthDate.getTimezoneOffset() * 60 * 1000);
+    return adjustedBirthDate.getMonth() === today.getMonth();
+  });
+
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader title="Dashboard" />
+      <PageHeader title="Painel" />
       <main className="grid flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
         <StatsCards stats={stats} />
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <SalesChart salesData={salesData} />
+            <SalesChart salesData={sales} />
           </div>
           <div className="space-y-4">
             <LowStockAlert products={lowStockProducts} />
+            <BirthdaysAlert clients={birthdaysOfTheMonth} />
           </div>
         </div>
       </main>

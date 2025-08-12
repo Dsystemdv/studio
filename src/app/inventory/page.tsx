@@ -19,14 +19,14 @@ export default async function InventoryPage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader 
-        title="Inventário" 
+        title="Estoque" 
         actions={
           <div className="flex items-center gap-2">
             <ReportDownloader 
-                title="Relatório de Inventário"
+                title="Relatório de Estoque"
                 data={products} 
                 headers={productHeaders} 
-                filename="relatorio_inventario.docx"
+                filename="relatorio_estoque.docx"
             />
             <AddProductDialog />
           </div>

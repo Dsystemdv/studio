@@ -13,7 +13,7 @@ import LogoIcon from "./logo-icon";
 
 const navItems = [
   { href: "/", label: "Painel", icon: LayoutDashboard },
-  { href: "/inventory", label: "Inventário", icon: Boxes },
+  { href: "/inventory", label: "Estoque", icon: Boxes },
   { href: "/sales", label: "Vendas", icon: ShoppingCart },
   { href: "/invoices", label: "Notas", icon: Receipt },
   { href: "/clients", label: "Clientes", icon: Users },

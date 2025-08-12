@@ -155,7 +155,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
             <AlertDialogHeader>
                 <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
                 <AlertDialogDescription>
-                Esta ação não pode ser desfeita. Isso excluirá permanentemente o produto do seu inventário.
+                Esta ação não pode ser desfeita. Isso excluirá permanentemente o produto do seu estoque.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

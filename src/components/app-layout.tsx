@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import LogoIcon from "./logo-icon";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/", label: "Painel", icon: LayoutDashboard },
   { href: "/inventory", label: "Inventário", icon: Boxes },
   { href: "/sales", label: "Vendas", icon: ShoppingCart },
   { href: "/invoices", label: "Notas", icon: Receipt },

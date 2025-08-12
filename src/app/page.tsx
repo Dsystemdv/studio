@@ -5,9 +5,12 @@ import LowStockAlert from "@/components/dashboard/low-stock-alert";
 import { getLowStockProducts, getSales, getProducts } from "@/lib/data";
 
 export default async function Dashboard() {
+  const products = await getProducts();
+  const sales = await getSales();
+
   const stats = {
-    totalRevenue: (await getSales()).reduce((acc, sale) => acc + sale.total, 0),
-    salesThisMonth: (await getSales())
+    totalRevenue: sales.reduce((acc, sale) => acc + sale.total, 0),
+    salesThisMonth: sales
       .filter((sale) => {
         const saleDate = new Date(sale.date);
         const today = new Date();
@@ -17,10 +20,10 @@ export default async function Dashboard() {
         );
       })
       .reduce((acc, sale) => acc + sale.total, 0),
-    totalProducts: (await getProducts()).length,
+    totalProducts: products.length,
+    totalStockValue: products.reduce((acc, p) => acc + (p.costPrice * p.stock), 0),
   };
 
-  const salesData = await getSales();
   const lowStockProducts = await getLowStockProducts();
 
   return (
@@ -30,7 +33,7 @@ export default async function Dashboard() {
         <StatsCards stats={stats} />
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <SalesChart salesData={salesData} />
+            <SalesChart salesData={sales} />
           </div>
           <div className="space-y-4">
             <LowStockAlert products={lowStockProducts} />

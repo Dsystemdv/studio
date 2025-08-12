@@ -2,11 +2,13 @@ import PageHeader from "@/components/page-header";
 import StatsCards from "@/components/dashboard/stats-cards";
 import SalesChart from "@/components/dashboard/sales-chart";
 import LowStockAlert from "@/components/dashboard/low-stock-alert";
-import { getLowStockProducts, getSales, getProducts } from "@/lib/data";
+import { getLowStockProducts, getSales, getProducts, getClients } from "@/lib/data";
+import BirthdaysAlert from "@/components/dashboard/birthdays-alert";
 
 export default async function Dashboard() {
   const products = await getProducts();
   const sales = await getSales();
+  const clients = await getClients();
 
   const stats = {
     totalRevenue: sales.reduce((acc, sale) => acc + sale.total, 0),
@@ -26,6 +28,15 @@ export default async function Dashboard() {
 
   const lowStockProducts = await getLowStockProducts(3);
 
+  const birthdaysOfTheMonth = clients.filter(client => {
+    const today = new Date();
+    const birthDate = new Date(client.birthDate);
+    // Adjust for timezone offset to prevent issues
+    const adjustedBirthDate = new Date(birthDate.valueOf() + birthDate.getTimezoneOffset() * 60 * 1000);
+    return adjustedBirthDate.getMonth() === today.getMonth();
+  });
+
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Painel" />
@@ -37,6 +48,7 @@ export default async function Dashboard() {
           </div>
           <div className="space-y-4">
             <LowStockAlert products={lowStockProducts} />
+            <BirthdaysAlert clients={birthdaysOfTheMonth} />
           </div>
         </div>
       </main>
